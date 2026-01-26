@@ -1,0 +1,1 @@
+Pour les requêtes post get tout ça (ça fait un peu pont entre models et services, en plus des requêtes)
