@@ -60,12 +60,18 @@ usergamelist = usergame.get("games")
 
 tabgame = []
 for game in usergamelist:
-    tabgame.append([game.get("name"), int(game.get("playtime_forever"))])
+    tabgame.append([game.get("appid"), game.get("name"), int(game.get("playtime_forever"))])
 
-tabgame.sort(key=lambda x: x[1], reverse=True)
+tabgame.sort(key=lambda x: x[2], reverse=True)
 
-print(usergame)
+#print(usergame)
 
-for game in tabgame:
-    print(game[0], ":" , game[1]//60, "h", game[1]%60, "min")
+#for game in tabgame:
+    #print(game[0],"--", game[1], ":" , game[2]//60, "h", game[2]%60, "min")
+
+url = f"https://steamspy.com/api.php?request=appdetails&appid={tabgame[0][0]}"
+
+response = requests.get(url)
+
+#print(response.json().get("tags"))
 
