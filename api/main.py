@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
 
@@ -17,3 +18,5 @@ async def recommend(request: SteamRequest):
         "game": "Half-Life 3",
         "score": 0.95
     }
+
+Instrumentator().instrument(app).expose(app)
