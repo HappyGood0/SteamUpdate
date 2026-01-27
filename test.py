@@ -2,7 +2,6 @@ from steam_web_api import Steam
 import os
 from dotenv import load_dotenv
 import requests
-from bs4 import BeautifulSoup
 import numpy as np
 
 # Charge les variables du fichier .env situé dans le même dossier
@@ -14,9 +13,17 @@ KEY = os.getenv("STEAM_API_KEY")
     
     # Utilisation de la variable KEY ici
 steam = Steam(KEY)
+ #
 
-
-
+VALIDTAG = ["Atmospheric", "Fantasy", "Relaxing", "Funny", "Horror", "Sci-fi", "Futuristic", "Retro", "Dark", "Mystery", "Survival", "Psychological Horror",
+"Medieval", "Management", "Sports", "Building", "Tactical", "Drama", "Space", "Romance", "Racing", "Dark Fantasy", "Logic", "Emotional", "Nature",
+"Post-apocalyptic", "War", "Historical", "Zombies", "Stealth", "Investigation", "Dark Humor", "Parkour", "Flight", "Pirates", "Steampunk",
+"Indie", "Action", "Casual", "Adventure", "Simulation", "RPG", "Strategy", "Action-Adventure",
+"3D", "2D", "First-Person", "Third-Person", "Top-Down", "Realistic", "Cartoony", "Hand-drawn", "Text-Based", "Isometric",
+"PvP", "PvE", "Open World", "Story Rich", "Combat", "Controller", "Choices Matter", "Linear", "Turn-Based Combat", "Turn-Based Tactics", "Hack and Slash",
+"Deckbuilding", "Team-Based",
+"Puzzle", "Platformer", "Shooter", "Arcade", "Visual Novel", "Roguelike", "Sandbox", "Point & Click", "RTS", "Tower Defense", "Rhythm",
+"Singleplayer", "Multiplayer", "Online Co-op", "Local Co-op"]
 
 #------------------------------------------------------------------#
 
@@ -79,7 +86,15 @@ for i in range(0,5):
     url = f"https://steamspy.com/api.php?request=appdetails&appid={gameid}"
     response = requests.get(url).json()
     tags = response.get("tags")
+
+    for tag in list(tags.keys()):
+        if tag not in VALIDTAG:
+            del tags[tag]
     usergametags.append([gameid, gamedata[i][1], tags])
 
 for game in usergametags:
     print(game)
+
+
+
+
