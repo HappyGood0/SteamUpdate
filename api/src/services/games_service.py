@@ -66,7 +66,7 @@ class GamesService:
 
             avgplaytime4ever = response.get("median_forever")
             avgplaytime2weeks = response.get("median_2weeks")
-            
+
             k = 480
 
             if response.get("price") != "0" and response.get("price") != None:
@@ -86,7 +86,7 @@ class GamesService:
         useravgprice = 1
         nbpaidgame = 1
         for game in usergamelist:
-            gameid = game.get("appid")
+            gameid = game[0]
             url = f"https://steamspy.com/api.php?request=appdetails&appid={gameid}"
             response = requests.get(url).json()
 
@@ -96,3 +96,19 @@ class GamesService:
 
         return useravgprice/nbpaidgame
     
+
+    def get_favorite_game_tags(self, gamedata) -> list:
+        usergametags = []
+
+        for i in range(0,5):
+            gameid = gamedata[i][0]
+            url = f"https://steamspy.com/api.php?request=appdetails&appid={gameid}"
+            response = requests.get(url).json()
+            tags = response.get("tags")
+
+            for tag in list(tags.keys()):
+                if tag not in VALIDTAG:
+                    del tags[tag]
+            usergametags.append([gameid, gamedata[i][1], gamedata[i][6], tags])
+
+        return usergametags
