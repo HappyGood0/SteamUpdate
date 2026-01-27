@@ -7,5 +7,5 @@ from src.models.Games import GamesRecommendationRequest, GamesRecommendationResp
 router = APIRouter(prefix="/weather", tags=["Weather"])
 
 
-@router.get("/current", response_model=GamesRecommendationResponse)
-async def get_game_recommendations(
+# @router.get("/current", response_model=GamesRecommendationResponse)
+# async def get_game_recommendations(
