@@ -20,13 +20,11 @@ services:
       - steam-Update-network
       - monitoring
 
-  # Service Frontend Web (Vue.js + Nginx)
+  # Service Frontend Web (HTML + Nginx)
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: http://localhost:8000/api
     container_name: Steam-Update-web
     ports:
       - "5173:80"
@@ -53,6 +51,7 @@ services:
       - prom_data:/prometheus
     networks:
       - monitoring
+      
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -64,15 +63,64 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=grafana
     volumes:
       - ./grafana:/etc/grafana/provisioning/datasources
+      - grafana_storage:/var/lib/grafana
     networks:
       - monitoring
 
+  # heuuu pour le moment ca reste comme ca
+  mlflow:
+  
+    restart: unless-stopped
+    image: burakince/mlflow:3.1.4
+    container_name: mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_S3_ENDPOINT_URL=http://garage:3900
+      - AWS_ACCESS_KEY_ID=GKcf30fc448c30038ac06884a2
+      - AWS_SECRET_ACCESS_KEY=b41825c9abeeecd31a26e7bb571881b4f55246b8bc11d7f653debdcdca1fd82b
+      - MLFLOW_GUNICORN_OPTS='--log-level=debug'
+    command: >
+      mlflow server
+      --backend-store-uri postgresql://postgres:password@postgres:5432/mlflow
+      --artifacts-destination s3://mlflow-bucket
+      --serve-artifacts
+      --host 0.0.0.0
+    depends_on:
+      - garage
+      - postgres
+
+  garage:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage
+    restart: unless-stopped
+    ports:
+      - "3900:3900"
+      - "3901:3901"
+      - "3902:3902"
+      - "3903:3903"
+    volumes:
+      - ./garage.toml:/etc/garage.toml
+      - ./mlflow/data/garage/meta:/var/lib/garage/meta
+      - ./mlflow/data/garage/data:/var/lib/garage/data
+
+  postgres:
+    image: 'postgres:17.5'
+    restart: unless-stopped
+    ports:
+      - 15432:5432
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'mlflow'
+    volumes:
+      - ./mlflow/data/mlflow/postgres:/var/lib/postgresql/data/
 volumes:
   grafana_storage: {}
   prom_data: {}
 
 networks:
-  cy-weather-network:
+  steam-Update-network:
     driver: bridge
   monitoring:
     driver: bridge
