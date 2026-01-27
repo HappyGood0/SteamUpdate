@@ -100,8 +100,8 @@ services:
       - "3903:3903"
     volumes:
       - ./garage.toml:/etc/garage.toml
-      - ./data/garage/meta:/var/lib/garage/meta
-      - ./data/garage/data:/var/lib/garage/data
+      - ./mlflow/data/garage/meta:/var/lib/garage/meta
+      - ./mlflow/data/garage/data:/var/lib/garage/data
 
   postgres:
     image: 'postgres:17.5'
@@ -113,7 +113,7 @@ services:
       POSTGRES_PASSWORD: 'password'
       POSTGRES_DB: 'mlflow'
     volumes:
-      - ./data/mlflow/postgres:/var/lib/postgresql/data/
+      - ./mlflow/data/mlflow/postgres:/var/lib/postgresql/data/
 volumes:
   grafana_storage: {}
   prom_data: {}
