@@ -20,13 +20,11 @@ services:
       - steam-Update-network
       - monitoring
 
-  # Service Frontend Web (Vue.js + Nginx)
+  # Service Frontend Web (HTML + Nginx)
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: http://localhost:8000/api
     container_name: Steam-Update-web
     ports:
       - "5173:80"
@@ -53,6 +51,7 @@ services:
       - prom_data:/prometheus
     networks:
       - monitoring
+      
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -120,7 +119,7 @@ volumes:
   prom_data: {}
 
 networks:
-  cy-weather-network:
+  steam-Update-network:
     driver: bridge
   monitoring:
     driver: bridge
