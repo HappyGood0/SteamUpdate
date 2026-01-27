@@ -9,6 +9,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.metrics import f1_score, precision_score, recall_score
 from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
+from spnego import client
 # Configuration MLflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
@@ -93,3 +94,14 @@ with mlflow.start_run(run_name="random_forest_topGamesUser"):
     
     print(f"\n🎉 Run terminé! Consultez MLflow UI pour voir les résultats.")
     print(f"Run ID: {mlflow.active_run().info.run_id}")
+
+    try:
+        client.transition_model_version_stage(
+            name="topGamesUser_regressor",
+            version=1,
+            stage="Staging"
+        )
+        print("✅ Version 1 déplacée vers Staging")
+    except Exception as e:
+        print(f"⚠️  Impossible de changer le stage: {e}")
+
