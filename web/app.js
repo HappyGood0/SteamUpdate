@@ -16,16 +16,12 @@ form.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
     
     try {
-        const response = await fetch(`${API_URL}/recommend`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ steam_id: steamId })
-        });
-        
+        const response = await fetch(`${API_URL}/games/current?id=${steamId}`, {  // Changez l'URL pour cibler /games/current et passez l'ID comme paramètre de requête
+        method: 'GET',  // Assurez-vous que c'est une requête GET
+    });
+
         const data = await response.json();
-        
+
         if (response.ok) {
             showResult('success', `Utilisateur: ${steamId}<br>Jeu: ${data.game}<br>Score: ${data.score}`);
         } else {
