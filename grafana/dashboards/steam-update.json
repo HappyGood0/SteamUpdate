@@ -1,0 +1,23 @@
+{
+  "uid": "steam-update",
+  "title": "Steam Update",
+  "refresh": "5s",
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Health Check Requests",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+      "targets": [
+        {
+          "expr": "Health_check_requests_total",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
