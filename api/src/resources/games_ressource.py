@@ -4,7 +4,7 @@ import httpx
 from src.models.Games import GamesRecommendationRequest, GamesRecommendationResponse
 
 # Router pour les endpoints météo
-router = APIRouter(prefix="/weather", tags=["Weather"])
+router = APIRouter(prefix="/games", tags=["Games"])
 
 
 @router.get("/current", response_model=GamesRecommendationResponse)
