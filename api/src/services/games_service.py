@@ -50,7 +50,7 @@ class GamesService:
         return recommended_games
     
     def get_user_game_list(self) -> list:
-        usergame = self.steam.users.get_owned_games("76561198205309263")
+        usergame = self.steam.users.get_owned_games(self.idSteam)
         usergamelist = usergame.get("games")
         gamedata = []
         
@@ -98,17 +98,23 @@ class GamesService:
     
 
     def get_favorite_game_tags(self, gamedata) -> list:
+
         usergametags = []
 
         for i in range(0,5):
             gameid = gamedata[i][0]
             url = f"https://steamspy.com/api.php?request=appdetails&appid={gameid}"
             response = requests.get(url).json()
-            tags = response.get("tags")
+            tags = response.get("tags", {})
+    
+            if isinstance(tags, dict):
 
-            for tag in list(tags.keys()):
-                if tag not in VALIDTAG:
-                    del tags[tag]
-            usergametags.append([gameid, gamedata[i][1], gamedata[i][6], tags])
+                filtered_tags = {
+                    name: count for name, count in tags.items() 
+                    if name in VALIDTAG
+                }
+                
+                response["tags"] = filtered_tags
+            usergametags.append([gameid, gamedata[i][1], filtered_tags])
 
         return usergametags
