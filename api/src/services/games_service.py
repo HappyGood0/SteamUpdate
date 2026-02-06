@@ -73,7 +73,7 @@ class GamesService:
         # Convertir GamesStructure en dictionnaire pour faciliter l'accès
         game_dict = game.model_dump()
         
-        # Extraire les features du jeu d'entrée (tous les tags sauf id et nom)
+        # Extraire UNIQUEMENT les features (tags) du jeu d'entrée (sans id et nom)
         game_features = {}
         for tag in self.VALIDTAG:
             game_features[tag] = game_dict.get(tag, 0)
@@ -84,6 +84,7 @@ class GamesService:
         for idx, db_game in self.games_db.iterrows():
             try:
                 # Calculer la différence absolue entre les tags du jeu d'entrée et ceux de la BDD
+                # IMPORTANT : Ne créer le DataFrame qu'avec les colonnes de tags
                 features = {}
                 for tag in self.VALIDTAG:
                     db_value = db_game.get(tag, 0)
@@ -95,8 +96,10 @@ class GamesService:
                     # Calculer la différence absolue
                     features[tag] = abs(game_features[tag] - db_value)
                 
+                # Créer un DataFrame UNIQUEMENT avec les colonnes de tags (pas de 'id' ni 'nom')
+                df_features = pd.DataFrame([features], columns=self.VALIDTAG)
+                
                 # Prédire le score de similarité avec le modèle MLflow
-                df_features = pd.DataFrame([features])
                 similarity_score = self.model.predict(df_features)[0]
                 
                 # Construire le dictionnaire de données pour GamesStructure
@@ -126,6 +129,7 @@ class GamesService:
                 
             except Exception as e:
                 print(f"⚠️ Erreur pour le jeu à l'index {idx}: {e}")
+                print(f"   Détails: {str(e)}")
                 continue
         
         # Vérifier qu'on a au moins des résultats
@@ -137,7 +141,6 @@ class GamesService:
         
         # Retourner les top N meilleurs matchs
         return predictions[:top_n]
-
 
     def get_game_recommendations(self) -> GamesRecommendationResponse:
 
