@@ -71,7 +71,6 @@ services:
 
   # heuuu pour le moment ca reste comme ca
   mlflow:
-  
     restart: unless-stopped
     image: burakince/mlflow:3.1.4
     container_name: mlflow
@@ -81,7 +80,7 @@ services:
       - MLFLOW_S3_ENDPOINT_URL=http://garage:3900
       - AWS_ACCESS_KEY_ID=GKcf30fc448c30038ac06884a2
       - AWS_SECRET_ACCESS_KEY=b41825c9abeeecd31a26e7bb571881b4f55246b8bc11d7f653debdcdca1fd82b
-      - MLFLOW_GUNICORN_OPTS='--log-level=debug'
+      - MLFLOW_GUNICORN_OPTS=--timeout 600 --workers 4 --log-level=debug
     command: >
       mlflow server
       --backend-store-uri postgresql://postgres:password@postgres:5432/mlflow
