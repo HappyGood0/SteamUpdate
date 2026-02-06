@@ -1,6 +1,9 @@
+from turtle import pd
 import httpx
-from typing import Optional
+from typing import Dict, List, Optional
 from datetime import datetime
+from matplotlib.path import Path
+from matplotlib.path import Path
 from mlflow.tracking import MlflowClient
 import mlflow
 import mlflow.sklearn
@@ -8,6 +11,7 @@ from src.models.Games import (
     GamesRecommendationRequest,
     GamesRecommendationResponse,
     VALIDTAG,
+    GamesStructure,
 )
 from steam_web_api import Steam
 import os
@@ -26,6 +30,114 @@ class GamesService:
         load_dotenv()
         KEY = os.getenv("STEAM_API_KEY")
         self.steam = Steam(KEY)
+        try:
+            self.model = mlflow.sklearn.load_model("models:/topGamesUser_regressor/Staging")
+            print("✅ Modèle MLflow chargé avec succès")
+        except Exception as e:
+            print(f"⚠️ Erreur lors du chargement du modèle: {e}")
+            self.model = None
+
+        csv_path = Path(__file__).resolve().parents[3] / "bdd" / "steamgames.csv"
+        try:
+            self.games_db = pd.read_csv(csv_path, sep=',')
+            print(f"✅ Base de données chargée: {len(self.games_db)} jeux")
+        except Exception as e:
+            print(f"⚠️ Erreur lors du chargement de la BDD: {e}")
+            self.games_db = None
+    
+    def getBestGamesWithScores(self, game: GamesStructure, top_n: int = 3) -> List[Dict]:
+        """
+        Compare un jeu avec tous les jeux de la base de données et retourne les meilleurs matchs
+        
+        Args:
+            game: Instance de GamesStructure à comparer
+            top_n: Nombre de recommandations à retourner
+            
+        Returns:
+            Liste de dictionnaires contenant 'game' (GamesStructure) et 'similarity_score' (float)
+            Exemple: [
+                {
+                    'game': GamesStructure(...),
+                    'similarity_score': 95.5
+                },
+                ...
+            ]
+        """
+        
+        if self.model is None:
+            raise Exception("Modèle MLflow non disponible")
+        
+        if self.games_db is None or self.games_db.empty:
+            raise Exception("Base de données de jeux non disponible")
+        
+        # Convertir GamesStructure en dictionnaire pour faciliter l'accès
+        game_dict = game.model_dump()
+        
+        # Extraire les features du jeu d'entrée (tous les tags sauf id et nom)
+        game_features = {}
+        for tag in self.VALIDTAG:
+            game_features[tag] = game_dict.get(tag, 0)
+        
+        predictions = []
+        
+        # Calculer le score de similarité pour chaque jeu de la base
+        for idx, db_game in self.games_db.iterrows():
+            try:
+                # Calculer la différence absolue entre les tags du jeu d'entrée et ceux de la BDD
+                features = {}
+                for tag in self.VALIDTAG:
+                    db_value = db_game.get(tag, 0)
+                    
+                    # Gérer les valeurs manquantes (NaN)
+                    if pd.isna(db_value):
+                        db_value = 0
+                        
+                    # Calculer la différence absolue
+                    features[tag] = abs(game_features[tag] - db_value)
+                
+                # Prédire le score de similarité avec le modèle MLflow
+                df_features = pd.DataFrame([features])
+                similarity_score = self.model.predict(df_features)[0]
+                
+                # Construire le dictionnaire de données pour GamesStructure
+                game_data = {
+                    'id': int(idx),  # Utiliser l'index comme ID
+                    'nom': str(db_game.get('nom', db_game.get('name', f'Game {idx}')))
+                }
+                
+                # Ajouter tous les tags avec leurs valeurs
+                for tag in self.VALIDTAG:
+                    tag_value = db_game.get(tag, 0)
+                    
+                    # Gérer les valeurs manquantes
+                    if pd.isna(tag_value):
+                        tag_value = 0
+                        
+                    game_data[tag] = float(tag_value)
+                
+                # Créer l'instance GamesStructure
+                game_structure = GamesStructure(**game_data)
+                
+                # Ajouter à la liste des prédictions
+                predictions.append({
+                    'game': game_structure,
+                    'similarity_score': float(similarity_score)
+                })
+                
+            except Exception as e:
+                print(f"⚠️ Erreur pour le jeu à l'index {idx}: {e}")
+                continue
+        
+        # Vérifier qu'on a au moins des résultats
+        if not predictions:
+            raise Exception("Aucune prédiction n'a pu être générée")
+        
+        # Trier par score de similarité décroissant (meilleurs matchs en premier)
+        predictions.sort(key=lambda x: x['similarity_score'], reverse=True)
+        
+        # Retourner les top N meilleurs matchs
+        return predictions[:top_n]
+
 
     def get_game_recommendations(self) -> GamesRecommendationResponse:
 
