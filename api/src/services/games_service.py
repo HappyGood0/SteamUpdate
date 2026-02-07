@@ -167,6 +167,10 @@ class GamesService:
         ]
         return recommended_games
     
+
+
+
+
     def get_user_game_list(self) -> list:
         start_time = time.time()
         try:
@@ -208,7 +212,11 @@ class GamesService:
         games_processed_per_recommendation.observe(len(gamedata))
         gamedata.sort(key=lambda x: x[6], reverse=True)
         return gamedata
-    
+
+
+
+
+
     def get_avg_price(self,usergamelist) -> float:
         useravgprice = 1
         nbpaidgame = 1
@@ -224,24 +232,71 @@ class GamesService:
         return useravgprice/nbpaidgame
     
 
+
+
+
     def get_favorite_game_tags(self, gamedata) -> list:
 
         usergametags = []
-
-        for i in range(0,5):
-            gameid = gamedata[i][0]
+        i=0
+        j=0
+        while i < 5:
+            gameid = gamedata[j][0]
             url = f"https://steamspy.com/api.php?request=appdetails&appid={gameid}"
             response = requests.get(url).json()
             tags = response.get("tags", {})
-    
-            if isinstance(tags, dict):
+            if isinstance(tags, dict) and tags!={}:
 
                 filtered_tags = {
-                    name: count for name, count in tags.items() 
-                    if name in VALIDTAG
+                    key: value for key, value in tags.items() 
+                    if key in VALIDTAG
                 }
+
+
+                i += 1
+                usergametags.append([gamedata[i], filtered_tags])
                 
-                response["tags"] = filtered_tags
-            usergametags.append([gameid, gamedata[i][1], filtered_tags])
+            
+            j += 1
 
         return usergametags
+    
+
+    def get_user_profil(self, usergametags) -> list:
+        sumLabels = 0
+        userscore = {}
+        for game in usergametags:
+            sumLabels += (sum(list(game[1].values())))
+            for label in game[1].items():
+                if label[0] in userscore.keys():
+                    userscore[label[0]] += round(label[1]/sumLabels,2)
+                else:
+                    userscore.update({label[0]:round(label[1]/sumLabels,2)})
+            
+
+            
+        userprofil = []
+
+        
+        userprofil.append(self.idSteam)
+        userprofil.append(usergametags)
+        userprofil.append(userscore)
+        return userprofil
+    
+
+
+    def get_game_structure(self) -> GamesStructure:
+        profil = GamesStructure
+        usergames = self.get_user_game_list()
+        topgametags = self.get_favorite_game_tags(usergames)
+        userprofil = self.get_user_profil(topgametags)
+        player_data = self.steam.users.get_user_details(self.idSteam).get("player", {})
+        profil.nom = (player_data.get("personaname"),"none")
+        for field_name, value in profil.model_dump().items():
+        
+            if isinstance(value, float):
+
+                if field_name in userprofil[2]:
+
+                    setattr(profil, field_name, userprofil[2][field_name])
+        return profil

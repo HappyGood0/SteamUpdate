@@ -33,12 +33,12 @@ VALIDTAG = ["Atmospheric", "Fantasy", "Relaxing", "Funny", "Horror", "Sci-fi", "
 colonneUser = ['ID', 'Atmospheric', 'Fantasy', 'Relaxing', 'Funny', 'Horror', 'Sci-fi', 'Futuristic', 'Retro', 'Dark', 'Mystery', 'Survival', 'Psychological Horror', 'Medieval', 'Management', 'Sports', 'Building', 'Tactical', 'Drama', 'Space', 'Romance', 'Racing', 'Dark Fantasy', 'Logic', 'Emotional', 'Nature', 'Post-apocalyptic', 'War', 'Historical', 'Zombies', 'Stealth', 'Investigation', 'Dark Humor', 'Parkour', 'Flight', 'Pirates', 'Steampunk', 'Indie', 'Action', 'Casual', 'Adventure', 'Simulation', 'RPG', 'Strategy', 'Action-Adventure', '3D', '2D', 'First-Person', 'Third-Person', 'Top-Down', 'Realistic', 'Cartoony', 'Hand-drawn', 'Text-Based', 'Isometric', 'PvP', 'PvE', 'Open World', 'Story Rich', 'Combat', 'Controller', 'Choices Matter', 'Linear', 'Turn-Based Combat', 'Turn-Based Tactics', 'Hack and Slash', 'Deckbuilding', 'Team-Based', 'Puzzle', 'Platformer', 'Shooter', 'Arcade', 'Visual Novel', 'Roguelike', 'Sandbox', 'Point & Click', 'RTS', 'Tower Defense', 'Rhythm', 'Singleplayer', 'Multiplayer', 'Online Co-op', 'Local Co-op']
 colonneGame = ['Utilisateur','Nom','Score', 'Atmospheric', 'Fantasy', 'Relaxing', 'Funny', 'Horror', 'Sci-fi', 'Futuristic', 'Retro', 'Dark', 'Mystery', 'Survival', 'Psychological Horror', 'Medieval', 'Management', 'Sports', 'Building', 'Tactical', 'Drama', 'Space', 'Romance', 'Racing', 'Dark Fantasy', 'Logic', 'Emotional', 'Nature', 'Post-apocalyptic', 'War', 'Historical', 'Zombies', 'Stealth', 'Investigation', 'Dark Humor', 'Parkour', 'Flight', 'Pirates', 'Steampunk', 'Indie', 'Action', 'Casual', 'Adventure', 'Simulation', 'RPG', 'Strategy', 'Action-Adventure', '3D', '2D', 'First-Person', 'Third-Person', 'Top-Down', 'Realistic', 'Cartoony', 'Hand-drawn', 'Text-Based', 'Isometric', 'PvP', 'PvE', 'Open World', 'Story Rich', 'Combat', 'Controller', 'Choices Matter', 'Linear', 'Turn-Based Combat', 'Turn-Based Tactics', 'Hack and Slash', 'Deckbuilding', 'Team-Based', 'Puzzle', 'Platformer', 'Shooter', 'Arcade', 'Visual Novel', 'Roguelike', 'Sandbox', 'Point & Click', 'RTS', 'Tower Defense', 'Rhythm', 'Singleplayer', 'Multiplayer', 'Online Co-op', 'Local Co-op']
 
-with open('userid.csv', 'r', encoding='utf-8') as f, \
-     open('topGamesUser.csv', 'a', encoding='utf-8') as gamefile, \
-     open('usersProfil.csv', 'a', encoding='utf-8') as userfile:
+with open('userid.csv', 'r', encoding='utf-8') as f:
+     #open('topGamesUser.csv', 'a', encoding='utf-8') as gamefile, \
+     #open('usersProfil.csv', 'a', encoding='utf-8') as userfile:
         
-    writerUser = csv.DictWriter(userfile, fieldnames=colonneUser)
-    writerGame = csv.DictWriter(gamefile, fieldnames=colonneGame)
+    #writerUser = csv.DictWriter(userfile, fieldnames=colonneUser)
+    #writerGame = csv.DictWriter(gamefile, fieldnames=colonneGame)
 
     idlist = csv.reader(f)
     for id in idlist:
@@ -46,7 +46,8 @@ with open('userid.csv', 'r', encoding='utf-8') as f, \
         iduser = id
 
         usergame = steam.users.get_owned_games(iduser)
-
+        user = steam.users.get_user_details("76561198167767436").get("player").get("personaname")
+        print(user)
         usergamelist = usergame.get("games")
 
         # for game in usergamelist:
@@ -133,12 +134,12 @@ with open('userid.csv', 'r', encoding='utf-8') as f, \
             
         userprofil = []
 
+        
         userprofil.append(iduser)
         userprofil.append(usergametags)
         userprofil.append(userscore)
 
         print(userprofil)
-
         user_profil = {
             'ID': iduser,
         }
@@ -154,7 +155,7 @@ with open('userid.csv', 'r', encoding='utf-8') as f, \
                     game_profil.update({label:round(game[1].get(label)/sum(list(game[1].values())),2)})
                 else:
                     game_profil.update({label:0})
-            writerGame.writerow(game_profil)
+            #writerGame.writerow(game_profil)
             
         for label in VALIDTAG:
             if label in userprofil[2].keys():
