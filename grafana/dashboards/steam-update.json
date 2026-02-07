@@ -1,23 +1,179 @@
 {
   "uid": "steam-update",
-  "title": "Steam Update",
+  "title": "Game Recommendations Monitoring",
   "refresh": "5s",
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "panels": [
     {
       "id": 1,
-      "title": "Health Check Requests",
+      "title": "Nombre de Recommandations (Succès vs Erreurs)",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [
+        {
+          "expr": "rate(recommendations_total{status=\"success\"}[1m]) * 60",
+          "legendFormat": "Succès (par minute)",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(recommendations_total{status=\"error\"}[1m]) * 60",
+          "legendFormat": "Erreurs (par minute)",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Temps de Réponse Moyen (Recommandations)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [
+        {
+          "expr": "rate(recommendation_response_time_seconds_sum[1m]) / rate(recommendation_response_time_seconds_count[1m])",
+          "legendFormat": "Temps moyen",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "lineWidth": 2
+          },
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 2, "color": "yellow"},
+              {"value": 5, "color": "red"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Temps de Réponse APIs Externes",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [
+        {
+          "expr": "rate(external_api_duration_seconds_sum{api=\"steam\"}[1m]) / rate(external_api_duration_seconds_count{api=\"steam\"}[1m])",
+          "legendFormat": "Steam API",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(external_api_duration_seconds_sum{api=\"steamspy\"}[1m]) / rate(external_api_duration_seconds_count{api=\"steamspy\"}[1m])",
+          "legendFormat": "SteamSpy API",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Erreurs APIs Externes (par minute)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [
+        {
+          "expr": "rate(external_api_errors_total{api=\"steam\"}[1m]) * 60",
+          "legendFormat": "Steam API",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(external_api_errors_total{api=\"steamspy\"}[1m]) * 60",
+          "legendFormat": "SteamSpy API",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Nombre Moyen de Jeux Analysés",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {
+          "expr": "rate(games_processed_per_recommendation_sum[1m]) / rate(games_processed_per_recommendation_count[1m])",
+          "legendFormat": "Jeux analysés (moyenne)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 500, "color": "yellow"},
+              {"value": 1000, "color": "red"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Total Health Checks",
+      "type": "stat",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
       "targets": [
         {
           "expr": "Health_check_requests_total",
           "refId": "A"
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": null, "color": "green"}
+            ]
+          }
+        }
+      }
     }
   ]
 }

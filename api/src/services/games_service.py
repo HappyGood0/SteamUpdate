@@ -3,7 +3,6 @@ import httpx
 from typing import Dict, List, Optional
 from datetime import datetime
 from matplotlib.path import Path
-from matplotlib.path import Path
 from mlflow.tracking import MlflowClient
 import mlflow
 import mlflow.sklearn
@@ -18,8 +17,12 @@ import os
 from dotenv import load_dotenv
 import requests
 import numpy as np
-
-
+import time
+from src.metrics import (
+    external_api_duration,
+    external_api_errors_total,
+    games_processed_per_recommendation
+)
 
 class GamesService:
     """Service pour récupérer les recommandations de jeux depuis une API fictive"""
@@ -165,36 +168,45 @@ class GamesService:
         return recommended_games
     
     def get_user_game_list(self) -> list:
-        usergame = self.steam.users.get_owned_games(self.idSteam)
+        start_time = time.time()
+        try:
+            usergame = self.steam.users.get_owned_games(self.idSteam)
+            external_api_duration.labels(api='steam').observe(time.time() - start_time)
+        except Exception as e:
+            external_api_errors_total.labels(api='steam', error_type='error').inc()
+            raise
+    
         usergamelist = usergame.get("games")
         gamedata = []
         
         for game in usergamelist:
-            
             gameid = game.get("appid")
             gamename = game.get("name")
             gameplaytime4ever = game.get("playtime_forever")
             gameplaytime2weeks = game.get("playtime_2weeks") if game.get("playtime_2weeks")!=None else 0
 
             url = f"https://steamspy.com/api.php?request=appdetails&appid={gameid}"
-            response = requests.get(url).json()
+            start_time = time.time()
+            try:
+                response = requests.get(url).json()
+                external_api_duration.labels(api='steamspy').observe(time.time() - start_time)
+            except Exception as e:
+                external_api_errors_total.labels(api='steamspy', error_type='error').inc()
+                continue
 
             avgplaytime4ever = response.get("median_forever")
             avgplaytime2weeks = response.get("median_2weeks")
-
             k = 480
 
             if response.get("price") != "0" and response.get("price") != None:
                 k = 0
 
-
             if avgplaytime4ever != 0:
                 score = 0.7*np.log(1+gameplaytime4ever)/np.log(1+(avgplaytime4ever + k)) + 0.3*np.log(1+gameplaytime2weeks)/np.log(1+avgplaytime2weeks) if avgplaytime2weeks > 0 else 0.7*np.log(1+gameplaytime4ever)/np.log(1+(avgplaytime4ever + k))
                 gamedata.append([gameid, gamename, gameplaytime4ever, gameplaytime2weeks, avgplaytime4ever, avgplaytime2weeks, score])
 
-
+        games_processed_per_recommendation.observe(len(gamedata))
         gamedata.sort(key=lambda x: x[6], reverse=True)
-
         return gamedata
     
     def get_avg_price(self,usergamelist) -> float:
