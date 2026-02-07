@@ -1,0 +1,187 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: steam-update-alerts
+    folder: Steam Update
+    interval: 1m
+    rules:
+      - uid: high-recommendation-errors
+        title: "Taux d'erreurs élevé"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: rate(recommendations_total{status="error"}[5m])
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    params: [0.1]
+                    type: gt
+                  operator:
+                    type: and
+              refId: C
+        noDataState: OK
+        execErrState: OK
+        for: 2m
+        annotations:
+          description: "Le taux d'erreurs de recommandations dépasse 0.1/s"
+        labels:
+          severity: critical
+
+      - uid: slow-response-time
+        title: Temps de réponse lent
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: rate(recommendation_response_time_seconds_sum[5m]) / rate(recommendation_response_time_seconds_count[5m])
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    params: [3]
+                    type: gt
+                  operator:
+                    type: and
+              refId: C
+        noDataState: OK
+        execErrState: OK
+        for: 3m
+        annotations:
+          description: "Le temps de réponse moyen dépasse 3 secondes"
+        labels:
+          severity: warning
+    
+      - uid: external-api-errors
+        title: Erreurs API externes
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: sum(rate(external_api_errors_total[5m]))
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    params: [0.2]
+                    type: gt
+                  operator:
+                    type: and
+              refId: C
+        noDataState: OK
+        execErrState: OK
+        for: 2m
+        annotations:
+          description: "Erreurs sur les APIs Steam/SteamSpy détectées (> 0.2/s)"
+        labels:
+          severity: warning
+
+      - uid: high-healthcheck-requests
+        title: Trop de requêtes healthcheck
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: rate(Health_check_requests_total[2m]) * 60
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    params: [20]
+                    type: gt
+                  operator:
+                    type: and
+              refId: C
+        noDataState: OK
+        execErrState: OK
+        for: 1m
+        annotations:
+          description: "Plus de 20 requêtes healthcheck par minute détectées"
+        labels:
+          severity: info
