@@ -37,6 +37,12 @@ class GamesService:
         except Exception as e:
             print(f"⚠️ Erreur lors du chargement du modèle: {e}")
             self.model = None
+        current_file = Path(__file__).resolve()
+        print(f"Fichier actuel: {current_file}")
+        print(f"parents[0]: {current_file.parents[0]}")  # services/
+        print(f"parents[1]: {current_file.parents[1]}")  # src/
+        print(f"parents[2]: {current_file.parents[2]}")  # racine projet
+        print(f"parents[3]: {current_file.parents[3]}")  # parent de la racine
 
         csv_path = Path(__file__).resolve().parents[3] / "bdd" / "top100games.csv"
         try:
@@ -141,28 +147,6 @@ class GamesService:
 
         # Retourner les top N meilleurs matchs
         return predictions[:top_n]
-
-    def get_game_recommendations(self) -> GamesRecommendationResponse:
-
-        # Logique fictive pour récupérer les recommandations de jeux
-        # Remplacez ceci par la logique réelle pour interagir avec une API de jeux
-        recommended_games = [
-            GamesRecommendationResponse(
-                img="https://example.com/game1.jpg",
-                prix=1999,
-                tags=["Action", "Aventure"],
-                nom="Jeu A",
-                lien="https://store.steampowered.com/app/123456/Jeu_A/",
-            ),
-            GamesRecommendationResponse(
-                img="https://example.com/game2.jpg",
-                prix=2999,
-                tags=["RPG", "Multijoueur"],
-                nom="Jeu B",
-                lien="https://store.steampowered.com/app/654321/Jeu_B/",
-            ),
-        ]
-        return recommended_games
 
     def get_user_game_list(self) -> list:
         start_time = time.time()

@@ -7,7 +7,7 @@ router = APIRouter(prefix="/games", tags=["Games"])
 
 
 @router.get("/current", response_model=GamesRecommendationResponse)
-async def get_game_recommendations(
+async def get_game_structure(
     id: int = Query(..., description="ID du jeu de référence", ge=0),
 ):
     """
@@ -25,7 +25,7 @@ async def get_game_recommendations(
     try:
         # Logique pour récupérer les recommandations de jeux
         # Ceci est un exemple fictif, remplacez-le par la logique réelle
-        recommanded_games = await get_game_recommendations(id)
+        recommanded_games = await get_game_structure(id)
         return recommanded_games
 
     except httpx.HTTPStatusError as e:
