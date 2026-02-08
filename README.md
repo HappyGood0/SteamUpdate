@@ -13,13 +13,11 @@ SteamUpdate (nom provisioire) présente une interface Web permettant de recomman
 [...]
 
 
-# MLFlow
-
 ## Mise en place de Garage
 
 1. Démarrer le service Garage avec Docker Compose :
 ```shell
-docker compose up garage -d
+docker compose up  -d
 ```
 
 2. Vérifier que le service fonctionne :
@@ -49,7 +47,7 @@ docker exec -it garage /garage bucket allow --read --write --owner mlflow-bucket
 
 Mémoriser la valeur de la key retournée (Key ID et Secret key).
 
-6. Dans le fichier `mlflow/docker-compose.yaml`, modifier les variables d'environnement `AWS_ACCESS_KEY_ID` et `AWS_SECRET_ACCESS_KEY` pour le service `mlflow` avec les valeurs de la key mémorisées précédemment.
+6. Dans le fichier `docker-compose.yaml`, modifier les variables d'environnement `AWS_ACCESS_KEY_ID` et `AWS_SECRET_ACCESS_KEY` pour le service `mlflow` avec les valeurs de la key mémorisées précédemment.
 
 ## Démarrer le service MLFlow avec Docker Compose :
 
