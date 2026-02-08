@@ -1,22 +1,25 @@
-const API_URL = '/api';
+const IS_GH_PAGES = window.location.hostname.endsWith("github.io");
+const RENDER_ORIGIN = "https://steamupdate.onrender.com";
+const API_ORIGIN = IS_GH_PAGES ? RENDER_ORIGIN : "";
+const API_URL = `${API_ORIGIN}/api`;
+
 
 const apiDot = document.getElementById('apiDot');
 const apiStatus = document.getElementById('apiStatus');
 
 (async () => {
   try {
-    const r = await fetch(`${API_URL}/health`, { method: 'GET' });
+    const r = await fetch(`${API_URL}/health`, { method: "GET" });
     if (!r.ok) throw new Error();
-    apiDot.classList.remove('bad');
-    apiDot.classList.add('ok');
-    apiStatus.textContent = 'API: OK';
+    apiDot.classList.remove("bad");
+    apiDot.classList.add("ok");
+    apiStatus.textContent = "API: OK";
   } catch {
-    apiDot.classList.remove('ok');
-    apiDot.classList.add('bad');
+    apiDot.classList.remove("ok");
+    apiDot.classList.add("bad");
     apiStatus.textContent = 'API: indisponible';
   }
 })();
-
 
 const form = document.getElementById('steamForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -40,19 +43,29 @@ form.addEventListener('submit', async (e) => {
     body: JSON.stringify({ steam_id: steamId }),
     });
 
-
     const contentType = response.headers.get('content-type') || '';
     const payload = contentType.includes('application/json')
         ? await response.json()
         : await response.text();
 
     if (response.ok) {
-        showResult('success', {
-            steamId,
-            game: payload.game,
-            score: payload.score,
-        });
+        // Nouveau format: { steam_id, recommendations: [...] }
+        if (payload && Array.isArray(payload.recommendations) && payload.recommendations.length > 0) {
+            const top = payload.recommendations[0];
 
+            showResult('success', {
+                steamId,
+                game: top.name ?? top.game ?? 'N/A',
+                score: top.score ?? 0,
+            });
+        } else {
+            // Ancien format: { steam_id, game, score }
+            showResult('success', {
+                steamId,
+                game: payload.game ?? 'N/A',
+                score: payload.score ?? 0,
+            });
+        }
     } else {
         const detail = typeof payload === 'object' && payload !== null ? payload.detail : payload;
         showResult('error', detail || `Erreur HTTP ${response.status}`);
@@ -62,9 +75,9 @@ form.addEventListener('submit', async (e) => {
     } finally {
     loading.classList.add('hidden');
     submitBtn.disabled = false;
-    }
-
+  }
 });
+
 function escapeHtml(s) {
   return String(s)
     .replaceAll('&', '&amp;')
@@ -104,8 +117,6 @@ function showResult(type, content) {
   result.innerHTML = `
     <div class="rec">
       <div class="recTop">
-        
-
         <div class="recTitle">
           <div class="kicker">Recommandation</div>
           <div class="headline">${game}</div>

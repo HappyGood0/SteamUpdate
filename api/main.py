@@ -1,6 +1,7 @@
 import time
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
@@ -8,8 +9,22 @@ from src.metrics import (
     recommendation_response_time,
     recommendations_total,
 )
+from src.services.games_service import GamesService
+
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://happygood0.github.io",
+        "http://localhost:5173",
+        "http://localhost",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 health_counter = Counter("Health_check_requests_total", "Number of health check requests received")
 
@@ -29,9 +44,13 @@ async def recommend(request: SteamRequest):
     start_time = time.time()
 
     try:
-        # faudra faire le traitement ici j'imagine, appeler les fonctions de games_service etc.
+        service = GamesService(id_steam=int(request.steam_id))
+        recommended = service.get_game_recommendations()
 
-        result = {"steam_id": request.steam_id, "game": "Half-Life 3", "score": 0.95}
+        result = {
+            "steam_id": request.steam_id,
+            "recommendations": recommended,
+        }
 
         recommendations_total.labels(status="success").inc()
 

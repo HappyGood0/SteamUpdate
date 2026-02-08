@@ -190,18 +190,17 @@ colonne_user = [
 
 i = 0
 testid = 76561198000047504
+
+
 def createbddtopgame():
     url = "https://steamspy.com/api.php?request=top100forever"
     response = requests.get(url).json()
-    with open('top100games.csv', 'a', encoding='utf-8') as topgame:
-        writerUser = csv.DictWriter(topgame, fieldnames=colonne_user)
+    with open("top100games.csv", "a", encoding="utf-8") as topgame:
+        writer_user = csv.DictWriter(topgame, fieldnames=colonne_user)
         for game in response:
             url = f"https://steamspy.com/api.php?request=appdetails&appid={str(game)}"
             currentgame = requests.get(url).json()
-            gameprofil = {
-                "ID": game,
-                "nom": currentgame.get("name")
-            }
+            gameprofil = {"ID": game, "nom": currentgame.get("name")}
 
             tags = currentgame.get("tags", {})
 
@@ -215,8 +214,8 @@ def createbddtopgame():
                     gameprofil.update({tags: value / total})
                 else:
                     gameprofil.update({tags: 0})
-            writerUser.writerow(gameprofil)
-            gameprofil={}
+            writer_user.writerow(gameprofil)
+            gameprofil = {}
+
 
 createbddtopgame()
-

@@ -1,12 +1,12 @@
 import os
 import time
-from turtle import pd
+from pathlib import Path
 
 import mlflow.sklearn
 import numpy as np
+import pandas as pd
 import requests
 from dotenv import load_dotenv
-from matplotlib.path import Path
 from src.metrics import (
     external_api_duration,
     external_api_errors_total,
