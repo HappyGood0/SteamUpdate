@@ -1,10 +1,8 @@
 import csv
-import json
 import os
-import time
 
-from dotenv import load_dotenv
 import requests
+from dotenv import load_dotenv
 from steam_web_api import Steam
 
 # Charge les variables du fichier .env situé dans le même dossier
@@ -204,21 +202,21 @@ def createbddtopgame():
                 "ID": game,
                 "nom": currentgame.get("name")
             }
-            
+
             tags = currentgame.get("tags", {})
-            
+
             if isinstance(tags, dict) and tags != {}:
                 filtered_tags = {key: value for key, value in tags.items() if key in VALIDTAG}
             total = round(sum(list(filtered_tags.values())), 2)
             for tags in VALIDTAG:
-                value = filtered_tags.get(tags) 
-                
+                value = filtered_tags.get(tags)
+
                 if value is not None:
                     gameprofil.update({tags: value / total})
                 else:
                     gameprofil.update({tags: 0})
-            #writerUser.writerow(gameprofil)
+            writerUser.writerow(gameprofil)
             gameprofil={}
 
-
+createbddtopgame()
 
