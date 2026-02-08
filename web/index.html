@@ -1,30 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Update</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SteamUpdate</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Steam Update</h1>
-        
-        <form id="steamForm">
-            <label for="steamId">Pseudo Steam</label>
-            <input 
-                type="text" 
-                id="steamId" 
-                placeholder="Entrez votre pseudo Steam" 
-                required
-            >
-            <button type="submit" id="submitBtn">Recommander</button>
-        </form>
+  <main class="page">
+    <section class="card">
+      <header class="header">
+        <div class="brand">
+          <div class="logo">
+            <img src="steam_logo.svg" alt="Steam logo">
+          </div>
 
-        <div id="loading" class="hidden">Chargement...</div>
-        <div id="result" class="hidden"></div>
-    </div>
+          <div>
+            <h1>SteamUpdate</h1>
+            <p class="subtitle">Recommandation rapide, front connecté via Nginx proxy.</p>
+          </div>
+        </div>
+      </header>
 
-    <script src="app.js"></script>
+      <form id="steamForm" class="form" autocomplete="off">
+        <label class="label" for="steamId">Steam ID ou pseudo</label>
+
+        <div class="inputRow">
+          <input
+            id="steamId"
+            name="steamId"
+            type="text"
+            inputmode="text"
+            placeholder="ex: 76561198167767436"
+            required
+          />
+          <button id="submitBtn" type="submit" class="btn">
+            Recommander
+          </button>
+        </div>
+
+        <div class="helper">
+          <span class="dot ok" id="apiDot" aria-hidden="true"></span>
+          <span id="apiStatus">API: vérification...</span>
+        </div>
+
+        <div id="loading" class="loading hidden" role="status" aria-live="polite">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Recherche en cours...</span>
+        </div>
+
+        <div id="result" class="result hidden" aria-live="polite"></div>
+      </form>
+
+      <footer class="footer">
+        <div class="meta">
+          <span>Frontend: Nginx</span>
+          <span class="sep">•</span>
+          <span>API: FastAPI</span>
+          <span class="sep">•</span>
+          <span>Proxy: /api → api:8000</span>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
 </body>
 </html>
