@@ -1,6 +1,7 @@
 import time
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
@@ -8,7 +9,6 @@ from src.metrics import (
     recommendation_response_time,
     recommendations_total,
 )
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.add_middleware(

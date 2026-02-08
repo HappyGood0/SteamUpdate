@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 VALIDTAG = [
     "Atmospheric",
@@ -105,6 +105,8 @@ class GamesRecommendationRequest(BaseModel):
 class GamesStructure(BaseModel):
     """DTO pour la structure d'un jeu dans la liste de jeux de l'utilisateur"""
 
+    model_config = ConfigDict(populate_by_name=True)
+
     nom: str = Field(..., description="Nom du jeu", min_length=1)
     Atmospheric: float = Field(..., description="Score du tag Atmospheric", ge=0)
     Fantasy: float = Field(..., description="Score du tag Fantasy", ge=0)
@@ -150,8 +152,8 @@ class GamesStructure(BaseModel):
     RPG: float = Field(..., description="Score du tag RPG", ge=0)
     Strategy: float = Field(..., description="Score du tag Strategy", ge=0)
     Action_Adventure: float = Field(..., description="Score du tag Action-Adventure", ge=0)
-    _3D: float = Field(..., description="Score du tag 3D", ge=0)
-    _2D: float = Field(..., description="Score du tag 2D", ge=0)
+    d3: float = Field(..., description="Score du tag 3D", ge=0)
+    d2: float = Field(..., description="Score du tag 2D", ge=0)
     First_Person: float = Field(..., description="Score du tag First-Person", ge=0)
     Third_Person: float = Field(..., description="Score du tag Third-Person", ge=0)
     Top_Down: float = Field(..., description="Score du tag Top-Down", ge=0)
