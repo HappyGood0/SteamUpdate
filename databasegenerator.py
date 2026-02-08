@@ -1,8 +1,10 @@
+import csv
 import json
 import os
 import time
 
 from dotenv import load_dotenv
+import requests
 from steam_web_api import Steam
 
 # Charge les variables du fichier .env situé dans le même dossier
@@ -15,22 +17,208 @@ KEY = os.getenv("STEAM_API_KEY")
 # Utilisation de la variable KEY ici
 steam = Steam(KEY)
 
+VALIDTAG = [
+    "Atmospheric",
+    "Fantasy",
+    "Relaxing",
+    "Funny",
+    "Horror",
+    "Sci-fi",
+    "Futuristic",
+    "Retro",
+    "Dark",
+    "Mystery",
+    "Survival",
+    "Psychological Horror",
+    "Medieval",
+    "Management",
+    "Sports",
+    "Building",
+    "Tactical",
+    "Drama",
+    "Space",
+    "Romance",
+    "Racing",
+    "Dark Fantasy",
+    "Logic",
+    "Emotional",
+    "Nature",
+    "Post-apocalyptic",
+    "War",
+    "Historical",
+    "Zombies",
+    "Stealth",
+    "Investigation",
+    "Dark Humor",
+    "Parkour",
+    "Flight",
+    "Pirates",
+    "Steampunk",
+    "Indie",
+    "Action",
+    "Casual",
+    "Adventure",
+    "Simulation",
+    "RPG",
+    "Strategy",
+    "Action-Adventure",
+    "3D",
+    "2D",
+    "First-Person",
+    "Third-Person",
+    "Top-Down",
+    "Realistic",
+    "Cartoony",
+    "Hand-drawn",
+    "Text-Based",
+    "Isometric",
+    "PvP",
+    "PvE",
+    "Open World",
+    "Story Rich",
+    "Combat",
+    "Controller",
+    "Choices Matter",
+    "Linear",
+    "Turn-Based Combat",
+    "Turn-Based Tactics",
+    "Hack and Slash",
+    "Deckbuilding",
+    "Team-Based",
+    "Puzzle",
+    "Platformer",
+    "Shooter",
+    "Arcade",
+    "Visual Novel",
+    "Roguelike",
+    "Sandbox",
+    "Point & Click",
+    "RTS",
+    "Tower Defense",
+    "Rhythm",
+    "Singleplayer",
+    "Multiplayer",
+    "Online Co-op",
+    "Local Co-op",
+]
+
+colonne_user = [
+    "ID",
+    "nom",
+    "Atmospheric",
+    "Fantasy",
+    "Relaxing",
+    "Funny",
+    "Horror",
+    "Sci-fi",
+    "Futuristic",
+    "Retro",
+    "Dark",
+    "Mystery",
+    "Survival",
+    "Psychological Horror",
+    "Medieval",
+    "Management",
+    "Sports",
+    "Building",
+    "Tactical",
+    "Drama",
+    "Space",
+    "Romance",
+    "Racing",
+    "Dark Fantasy",
+    "Logic",
+    "Emotional",
+    "Nature",
+    "Post-apocalyptic",
+    "War",
+    "Historical",
+    "Zombies",
+    "Stealth",
+    "Investigation",
+    "Dark Humor",
+    "Parkour",
+    "Flight",
+    "Pirates",
+    "Steampunk",
+    "Indie",
+    "Action",
+    "Casual",
+    "Adventure",
+    "Simulation",
+    "RPG",
+    "Strategy",
+    "Action-Adventure",
+    "3D",
+    "2D",
+    "First-Person",
+    "Third-Person",
+    "Top-Down",
+    "Realistic",
+    "Cartoony",
+    "Hand-drawn",
+    "Text-Based",
+    "Isometric",
+    "PvP",
+    "PvE",
+    "Open World",
+    "Story Rich",
+    "Combat",
+    "Controller",
+    "Choices Matter",
+    "Linear",
+    "Turn-Based Combat",
+    "Turn-Based Tactics",
+    "Hack and Slash",
+    "Deckbuilding",
+    "Team-Based",
+    "Puzzle",
+    "Platformer",
+    "Shooter",
+    "Arcade",
+    "Visual Novel",
+    "Roguelike",
+    "Sandbox",
+    "Point & Click",
+    "RTS",
+    "Tower Defense",
+    "Rhythm",
+    "Singleplayer",
+    "Multiplayer",
+    "Online Co-op",
+    "Local Co-op",
+]
+
+
 i = 0
 testid = 76561198000047504
-with open("userid.json", "a", encoding="utf-8") as f:
-    while i < 100:
-        print(testid)
-        owned_games = steam.users.get_owned_games(str(testid))
+def createbddtopgame():
+    url = "https://steamspy.com/api.php?request=top100forever"
+    response = requests.get(url).json()
+    with open('top100games.csv', 'a', encoding='utf-8') as topgame:
+        writerUser = csv.DictWriter(topgame, fieldnames=colonne_user)
+        for game in response:
+            url = f"https://steamspy.com/api.php?request=appdetails&appid={str(game)}"
+            currentgame = requests.get(url).json()
+            gameprofil = {
+                "ID": game,
+                "nom": currentgame.get("name")
+            }
+            
+            tags = currentgame.get("tags", {})
+            
+            if isinstance(tags, dict) and tags != {}:
+                filtered_tags = {key: value for key, value in tags.items() if key in VALIDTAG}
+            total = round(sum(list(filtered_tags.values())), 2)
+            for tags in VALIDTAG:
+                value = filtered_tags.get(tags) 
+                
+                if value is not None:
+                    gameprofil.update({tags: value / total})
+                else:
+                    gameprofil.update({tags: 0})
+            #writerUser.writerow(gameprofil)
+            gameprofil={}
 
-        if owned_games is not None:
-            games_list = owned_games.get("games", [])
 
-        if len(games_list) > 20:
-            json.dump(testid, f)
-            f.write("\n")
-            print("sucess")
-            i += 1
-            pass
-        testid += 1
-        print(i)
-        time.sleep(1)
+
