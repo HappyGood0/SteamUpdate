@@ -8,8 +8,21 @@ from src.metrics import (
     recommendation_response_time,
     recommendations_total,
 )
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://happygood0.github.io",
+        "http://localhost:5173",
+        "http://localhost",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 health_counter = Counter("Health_check_requests_total", "Number of health check requests received")
 
