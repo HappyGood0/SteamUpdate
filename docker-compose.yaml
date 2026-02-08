@@ -19,6 +19,8 @@ services:
     networks:
       - steam-Update-network
       - monitoring
+    volumes:
+      - ./bdd:/app/bdd
 
   # Service Frontend Web (HTML + Nginx)
   web:

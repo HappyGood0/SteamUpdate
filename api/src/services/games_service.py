@@ -44,7 +44,7 @@ class GamesService:
         print(f"parents[2]: {current_file.parents[2]}")  # racine projet
         print(f"parents[3]: {current_file.parents[3]}")  # parent de la racine
 
-        csv_path = Path(__file__).resolve().parents[3] / "bdd" / "top100games.csv"
+        csv_path = Path("/app/bdd/top100games.csv")
         try:
             self.games_db = pd.read_csv(csv_path, sep=",")
             print(f"✅ Base de données chargée: {len(self.games_db)} jeux")
