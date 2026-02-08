@@ -50,6 +50,7 @@ async def recommend(request: SteamRequest):
             "steam_id": request.steam_id,
             "recommendations": recommended,
         }
+        result["build"] = "46799e6"
 
         recommendations_total.labels(status="success").inc()
 
