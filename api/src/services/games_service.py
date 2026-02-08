@@ -31,18 +31,14 @@ class GamesService:
         load_dotenv()
         key = os.getenv("STEAM_API_KEY")
         self.steam = Steam(key)
-        try:
+        try:     
+            
+            mlflow.set_tracking_uri("http://mlflow:5000")
             self.model = mlflow.sklearn.load_model("models:/topGamesUser_regressor/Staging")
             print("✅ Modèle MLflow chargé avec succès")
         except Exception as e:
             print(f"⚠️ Erreur lors du chargement du modèle: {e}")
             self.model = None
-        current_file = Path(__file__).resolve()
-        print(f"Fichier actuel: {current_file}")
-        print(f"parents[0]: {current_file.parents[0]}")  # services/
-        print(f"parents[1]: {current_file.parents[1]}")  # src/
-        print(f"parents[2]: {current_file.parents[2]}")  # racine projet
-        print(f"parents[3]: {current_file.parents[3]}")  # parent de la racine
 
         csv_path = Path("/app/bdd/top100games.csv")
         try:
@@ -82,7 +78,7 @@ class GamesService:
 
         # Extraire UNIQUEMENT les features (tags) du jeu d'entrée (sans id et nom)
         game_features = {}
-        for tag in self.VALIDTAG:
+        for tag in VALIDTAG:
             game_features[tag] = game_dict.get(tag, 0)
 
         predictions = []
@@ -93,7 +89,7 @@ class GamesService:
                 # Calculer la différence absolue entre les tags du jeu d'entrée et ceux de la BDD
                 # IMPORTANT : Ne créer le DataFrame qu'avec les colonnes de tags
                 features = {}
-                for tag in self.VALIDTAG:
+                for tag in VALIDTAG:
                     db_value = db_game.get(tag, 0)
 
                     # Gérer les valeurs manquantes (NaN)
@@ -104,7 +100,7 @@ class GamesService:
                     features[tag] = abs(game_features[tag] - db_value)
 
                 # Créer un DataFrame UNIQUEMENT avec les colonnes de tags (pas de 'id' ni 'nom')
-                df_features = pd.DataFrame([features], columns=self.VALIDTAG)
+                df_features = pd.DataFrame([features], columns=VALIDTAG)
 
                 # Prédire le score de similarité avec le modèle MLflow
                 similarity_score = self.model.predict(df_features)[0]
@@ -116,7 +112,7 @@ class GamesService:
                 }
 
                 # Ajouter tous les tags avec leurs valeurs
-                for tag in self.VALIDTAG:
+                for tag in VALIDTAG:
                     tag_value = db_game.get(tag, 0)
 
                     # Gérer les valeurs manquantes
@@ -260,12 +256,12 @@ class GamesService:
         return userprofil
 
     def get_game_structure(self) -> GamesStructure:
-        profil = GamesStructure
+        profil = GamesStructure()
         usergames = self.get_user_game_list()
         topgametags = self.get_favorite_game_tags(usergames)
         userprofil = self.get_user_profil(topgametags)
         player_data = self.steam.users.get_user_details(self.id_steam).get("player", {})
-        profil.nom = (player_data.get("personaname"), "none")
+        profil.nom = player_data.get("personaname", "none")
         for field_name, value in profil.model_dump().items():
             if isinstance(value, float):
                 if field_name in userprofil[2]:

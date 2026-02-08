@@ -9,6 +9,8 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
@@ -80,6 +82,7 @@ services:
     ports:
       - "5000:5000"
     environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
       - MLFLOW_S3_ENDPOINT_URL=http://garage:3900
       - AWS_ACCESS_KEY_ID=GKcf30fc448c30038ac06884a2
       - AWS_SECRET_ACCESS_KEY=b41825c9abeeecd31a26e7bb571881b4f55246b8bc11d7f653debdcdca1fd82b
@@ -93,7 +96,8 @@ services:
     depends_on:
       - garage
       - postgres
-
+    networks:
+      - steam-Update-network
   garage:
     image: dxflrs/garage:v2.0.0
     container_name: garage
@@ -107,6 +111,8 @@ services:
       - ./garage.toml:/etc/garage.toml
       - ./mlflow/data/garage/meta:/var/lib/garage/meta
       - ./mlflow/data/garage/data:/var/lib/garage/data
+    networks:
+      - steam-Update-network
 
   postgres:
     image: 'postgres:17.5'
@@ -119,6 +125,10 @@ services:
       POSTGRES_DB: 'mlflow'
     volumes:
       - ./mlflow/data/mlflow/postgres:/var/lib/postgresql/data/
+    networks:
+      - steam-Update-network
+
+
 volumes:
   grafana_storage: {}
   prom_data: {}
