@@ -49,12 +49,23 @@ form.addEventListener('submit', async (e) => {
         : await response.text();
 
     if (response.ok) {
-        showResult('success', {
-            steamId,
-            game: payload.game,
-            score: payload.score,
-        });
+        // Nouveau format: { steam_id, recommendations: [...] }
+        if (payload && Array.isArray(payload.recommendations) && payload.recommendations.length > 0) {
+            const top = payload.recommendations[0];
 
+            showResult('success', {
+                steamId,
+                game: top.name ?? top.game ?? 'N/A',
+                score: top.score ?? 0,
+            });
+        } else {
+            // Ancien format: { steam_id, game, score }
+            showResult('success', {
+                steamId,
+                game: payload.game ?? 'N/A',
+                score: payload.score ?? 0,
+            });
+        }
     } else {
         const detail = typeof payload === 'object' && payload !== null ? payload.detail : payload;
         showResult('error', detail || `Erreur HTTP ${response.status}`);

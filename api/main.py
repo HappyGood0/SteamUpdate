@@ -9,6 +9,8 @@ from src.metrics import (
     recommendation_response_time,
     recommendations_total,
 )
+from src.services.games_service import GamesService
+
 
 app = FastAPI()
 app.add_middleware(
@@ -42,9 +44,13 @@ async def recommend(request: SteamRequest):
     start_time = time.time()
 
     try:
-        # faudra faire le traitement ici j'imagine, appeler les fonctions de games_service etc.
+        service = GamesService(id_steam=int(request.steam_id))
+        recommended = service.get_game_recommendations()
 
-        result = {"steam_id": request.steam_id, "game": "Half-Life 3", "score": 0.95}
+        result = {
+            "steam_id": request.steam_id,
+            "recommendations": recommended,
+        }
 
         recommendations_total.labels(status="success").inc()
 
