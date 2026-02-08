@@ -167,7 +167,7 @@ class GamesService:
     def get_user_game_list(self) -> list:
         start_time = time.time()
         try:
-            usergame = self.steam.users.get_owned_games(self.idSteam)
+            usergame = self.steam.users.get_owned_games(self.id_steam)
             external_api_duration.labels(api="steam").observe(time.time() - start_time)
         except Exception:
             external_api_errors_total.labels(api="steam", error_type="error").inc()

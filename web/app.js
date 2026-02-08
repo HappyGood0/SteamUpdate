@@ -55,8 +55,8 @@ form.addEventListener('submit', async (e) => {
 
             showResult('success', {
                 steamId,
-                game: top.name ?? top.game ?? 'N/A',
-                score: top.score ?? 0,
+                game: top.nom ?? top.name ?? top.game ?? 'N/A',
+                score: top.score ?? 0.95,
             });
         } else {
             // Ancien format: { steam_id, game, score }
