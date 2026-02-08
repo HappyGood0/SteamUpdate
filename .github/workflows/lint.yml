@@ -40,9 +40,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run ESLint
-        uses: sibiraj-s/action-eslint@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          eslint-args: '--ext=js --ignore-path=.gitignore'
-          extensions: 'js'
-          annotations: true
+          node-version: '20'
+
+      - name: Install ESLint
+        run: npm install -g eslint
+
+      - name: Run ESLint
+        run: eslint web/ --ext .js
