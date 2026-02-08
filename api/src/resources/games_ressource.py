@@ -1,7 +1,6 @@
-from fastapi import APIRouter, HTTPException, Query
-from typing import Optional
 import httpx
-from src.models.Games import GamesRecommendationRequest, GamesRecommendationResponse
+from fastapi import APIRouter, HTTPException, Query
+from src.models.Games import GamesRecommendationResponse
 
 # Router pour les endpoints météo
 router = APIRouter(prefix="/games", tags=["Games"])
@@ -34,16 +33,14 @@ async def get_game_recommendations(
             raise HTTPException(
                 status_code=404,
                 detail=f"Jeu avec ID '{id}' non trouvé.",
-            )
+            ) from e
         raise HTTPException(
             status_code=e.response.status_code,
             detail=f"Erreur lors de la récupération des données de jeu: {str(e)}",
-        )
+        ) from e
     except httpx.HTTPError as e:
         raise HTTPException(
             status_code=500, detail=f"Erreur de connexion à l'API de jeux: {str(e)}"
-        )
+        ) from e
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Erreur interne du serveur: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Erreur interne du serveur: {str(e)}") from e

@@ -1,0 +1,57 @@
+version: 2
+updates:
+  # Dépendances Python (API)
+  - package-ecosystem: "pip"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+
+  # Dépendances Python (MLflow Model)
+  - package-ecosystem: "pip"
+    directory: "/mlflow/model"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "mlflow"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Docker (API)
+  - package-ecosystem: "docker"
+    directory: "/api"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # Docker (Web)
+  - package-ecosystem: "docker"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # Docker (MLflow Model)
+  - package-ecosystem: "docker"
+    directory: "/mlflow/model"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"

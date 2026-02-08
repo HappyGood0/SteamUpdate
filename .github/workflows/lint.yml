@@ -1,0 +1,48 @@
+name: Linting
+
+on:
+  push:
+    branches:
+      - main
+      - feat/**
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ruff-backend:
+    name: Ruff (Python Backend)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff linter
+        run: ruff check .
+
+      - name: Run Ruff formatter check
+        run: ruff format --check .
+
+  eslint-frontend:
+    name: ESLint (JavaScript Frontend)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run ESLint
+        uses: sibiraj-s/action-eslint@v3
+        with:
+          eslint-args: '--ext=js --ignore-path=.gitignore'
+          extensions: 'js'
+          annotations: true
