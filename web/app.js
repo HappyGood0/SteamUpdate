@@ -56,6 +56,8 @@ form.addEventListener('submit', async (e) => {
             showResult('success', {
                 steamId,
                 game: top.nom ?? top.name ?? top.game ?? 'N/A',
+                image: top.img,
+                link: top.lien,
                 score: top.score ?? 0.95,
             });
         } else {
@@ -106,6 +108,8 @@ function showResult(type, content) {
   const game = escapeHtml(content.game);
   const scoreNum = Number(content.score);
   const score = Number.isFinite(scoreNum) ? scoreNum : 0;
+  const image = content.image ? escapeHtml(content.image) : null;
+  const link = content.link ? escapeHtml(content.link) : null;
   const pct = Math.max(0, Math.min(100, Math.round(score * 100)));
 
   const badge =
@@ -115,28 +119,47 @@ function showResult(type, content) {
 
   result.className = `result success`;
   result.innerHTML = `
-    <div class="rec">
-      <div class="recTop">
-        <div class="recTitle">
-          <div class="kicker">Recommandation</div>
-          <div class="headline">${game}</div>
-          <div class="subline">pour l’utilisateur <span class="mono">${steamId}</span></div>
-        </div>
+  <div class="rec">
+    <div class="recTop recTopWithImage">
 
-        <div class="pill">${badge}</div>
+      ${
+        image
+          ? `<div class="recImage">
+               <img src="${image}" alt="${game}">
+             </div>`
+          : ''
+      }
+
+      <div class="recTitle">
+        <div class="kicker">Recommandation</div>
+
+        ${
+          link
+            ? `<a class="headline" href="${link}" target="_blank" rel="noopener">${game}</a>`
+            : `<div class="headline">${game}</div>`
+        }
+
+        <div class="subline">
+          pour l’utilisateur <span class="mono">${steamId}</span>
+        </div>
       </div>
 
-      <div class="recBody">
-        <div class="scoreBlock">
-          <div class="scoreLabel">Score</div>
-          <div class="scoreValue">${score.toFixed(2)}</div>
-          <div class="bar">
-            <div class="barFill" style="width:${pct}%"></div>
+      <div class="pill">${badge}</div>
+    </div>
+
+    <div class="recBody">
+      <div class="scoreBlock">
+        <div class="scoreLabel">Score</div>
+        <div class="scoreValue">${score.toFixed(2)}</div>
+        <div class="bar">
+          <div class="barFill" style="width:${pct}%"></div>
         </div>
         <div class="scoreHint">${pct}% de similarité</div>
-        </div>
       </div>
     </div>
-  `;
+  </div>
+`;
+
+
   result.classList.remove('hidden');
 }

@@ -364,3 +364,29 @@ input[type="text"]:focus{
   .btn{width:100%}
   .recBody{grid-template-columns:1fr}
 }
+
+.recTopWithImage {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.recImage img {
+  width: 96px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.recTitle {
+  flex: 1;
+}
+
+.headline {
+  color: #7dd3fc;
+  text-decoration: none;
+}
+
+.headline:hover {
+  text-decoration: underline;
+}
