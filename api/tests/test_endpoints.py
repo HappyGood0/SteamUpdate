@@ -18,9 +18,10 @@ def test_recommend_endpoint_valid():
     assert response.status_code == 200
     data = response.json()
     assert "steam_id" in data
-    assert "game" in data
-    assert "score" in data
+    assert "recommendations" in data
     assert data["steam_id"] == "76561198167767436"
+    assert isinstance(data["recommendations"], list)
+    assert len(data["recommendations"]) > 0
 
 
 def test_recommend_endpoint_missing_steam_id():

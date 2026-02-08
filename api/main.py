@@ -11,7 +11,6 @@ from src.metrics import (
 )
 from src.services.games_service import GamesService
 
-
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
