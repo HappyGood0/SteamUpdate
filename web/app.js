@@ -104,11 +104,7 @@ function showResult(type, content) {
   result.innerHTML = `
     <div class="rec">
       <div class="recTop">
-        <div class="steamMark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-            <path d="M16.5 6.5a3.5 3.5 0 1 1-2.9 5.5l-3.4 2a3.3 3.3 0 0 1-3.1 4.5c-1.8 0-3.3-1.5-3.3-3.3 0-.2 0-.4.1-.6l5.3 2.2a2 2 0 1 0 1.6-3.6l-5.8-2.4a3.3 3.3 0 0 1 3.2-2.5c.8 0 1.6.3 2.2.8l3.2-1.9A3.5 3.5 0 0 1 16.5 6.5Z" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        
 
         <div class="recTitle">
           <div class="kicker">Recommandation</div>
@@ -125,23 +121,8 @@ function showResult(type, content) {
           <div class="scoreValue">${score.toFixed(2)}</div>
           <div class="bar">
             <div class="barFill" style="width:${pct}%"></div>
-          </div>
-          <div class="scoreHint">${pct}% de similarité</div>
         </div>
-
-        <div class="metaBlock">
-          <div class="metaRow">
-            <div class="metaKey">Source</div>
-            <div class="metaVal">API FastAPI via proxy Nginx</div>
-          </div>
-          <div class="metaRow">
-            <div class="metaKey">Statut</div>
-            <div class="metaVal ok">OK</div>
-          </div>
-          <div class="metaRow">
-            <div class="metaKey">Note</div>
-            <div class="metaVal">Prévu pour évoluer en Top N</div>
-          </div>
+        <div class="scoreHint">${pct}% de similarité</div>
         </div>
       </div>
     </div>
