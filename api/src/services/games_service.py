@@ -1,7 +1,7 @@
 import os
 import time
 from pathlib import Path
-
+import re
 import mlflow.sklearn
 import numpy as np
 import pandas as pd
@@ -14,6 +14,7 @@ from src.metrics import (
 )
 from src.models.Games import (
     VALIDTAG,
+    VALIDTAGBDD,
     GamesRecommendationResponse,
     GamesStructure,
 )
@@ -24,7 +25,7 @@ import mlflow
 
 class GamesService:
     """Service pour récupérer les recommandations de jeux depuis une API fictive"""
-
+    
     def __init__(self, id_steam: int):
         # Configuration de l'API de jeux (exemple fictif)
         self.id_steam = id_steam
@@ -47,7 +48,23 @@ class GamesService:
         except Exception as e:
             print(f"⚠️ Erreur lors du chargement de la BDD: {e}")
             self.games_db = None
-
+    
+    def formater_nom(self, chaine):
+        # On s'assure que c'est une chaîne
+        chaine = str(chaine)
+        
+        # [ \-\u2010-\u2015] cible :
+        # \- : le tiret standard
+        # \u2010-\u2015 : toute la gamme des tirets Unicode (longs, cadratins, etc.)
+        # " " : l'espace
+        resultat = re.sub(r'[^a-zA-Z0-9]', '_', chaine)
+        
+        # Gestion du chiffre au début
+        if resultat and resultat[0].isdigit():
+            resultat = "_" + resultat
+            
+        return resultat
+    
     def get_best_games_with_scores(self, game: GamesStructure, top_n: int = 3) -> list[dict]:
         """
         Compare un jeu avec tous les jeux de la base de données et retourne les meilleurs matchs
@@ -77,19 +94,23 @@ class GamesService:
         game_dict = game.model_dump()
 
         # Extraire UNIQUEMENT les features (tags) du jeu d'entrée (sans id et nom)
-        game_features = {}
-        for tag in VALIDTAG:
-            game_features[tag] = game_dict.get(tag, 0)
-
+        game_featuress = {}
+        for tag in VALIDTAGBDD:
+            game_featuress[tag] = game_dict.get(tag, 0)
+        print("game_features:", game_featuress)
         predictions = []
-
+        game_features = {}
+        for feat in game_featuress.items():
+            print("feat:", feat)
+            game_features.update({self.formater_nom(str(feat[0])): feat[1]})
+            
         # Calculer le score de similarité pour chaque jeu de la base
         for idx, db_game in self.games_db.iterrows():
             try:
                 # Calculer la différence absolue entre les tags du jeu d'entrée et ceux de la BDD
                 # IMPORTANT : Ne créer le DataFrame qu'avec les colonnes de tags
                 features = {}
-                for tag in VALIDTAG:
+                for tag in VALIDTAGBDD:
                     db_value = db_game.get(tag, 0)
 
                     # Gérer les valeurs manquantes (NaN)
@@ -100,11 +121,11 @@ class GamesService:
                     features[tag] = abs(game_features[tag] - db_value)
 
                 # Créer un DataFrame UNIQUEMENT avec les colonnes de tags (pas de 'id' ni 'nom')
-                df_features = pd.DataFrame([features], columns=VALIDTAG)
-
+                df_features = pd.DataFrame([features], columns=VALIDTAGBDD)
+                print ("df_features:", df_features)
                 # Prédire le score de similarité avec le modèle MLflow
                 similarity_score = self.model.predict(df_features)[0]
-
+                print ("similarity_score:", similarity_score)
                 # Construire le dictionnaire de données pour GamesStructure
                 game_data = {
                     "id": int(idx),  # Utiliser l'index comme ID
@@ -112,7 +133,7 @@ class GamesService:
                 }
 
                 # Ajouter tous les tags avec leurs valeurs
-                for tag in VALIDTAG:
+                for tag in VALIDTAGBDD:
                     tag_value = db_game.get(tag, 0)
 
                     # Gérer les valeurs manquantes
