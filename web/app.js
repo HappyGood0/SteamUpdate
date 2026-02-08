@@ -1,94 +1,94 @@
-const API_URL = '/api';
+const API_URL = "/api";
 
-const apiDot = document.getElementById('apiDot');
-const apiStatus = document.getElementById('apiStatus');
+const apiDot = document.getElementById("apiDot");
+const apiStatus = document.getElementById("apiStatus");
 
 (async () => {
   try {
-    const r = await fetch(`${API_URL}/health`, { method: 'GET' });
+    const r = await fetch(`${API_URL}/health`, { method: "GET" });
     if (!r.ok) throw new Error();
-    apiDot.classList.remove('bad');
-    apiDot.classList.add('ok');
-    apiStatus.textContent = 'API: OK';
+    apiDot.classList.remove("bad");
+    apiDot.classList.add("ok");
+    apiStatus.textContent = "API: OK";
   } catch {
-    apiDot.classList.remove('ok');
-    apiDot.classList.add('bad');
-    apiStatus.textContent = 'API: indisponible';
+    apiDot.classList.remove("ok");
+    apiDot.classList.add("bad");
+    apiStatus.textContent = "API: indisponible";
   }
 })();
 
 
-const form = document.getElementById('steamForm');
-const submitBtn = document.getElementById('submitBtn');
-const loading = document.getElementById('loading');
-const result = document.getElementById('result');
-const steamIdInput = document.getElementById('steamId');
+const form = document.getElementById("steamForm");
+const submitBtn = document.getElementById("submitBtn");
+const loading = document.getElementById("loading");
+const result = document.getElementById("result");
+const steamIdInput = document.getElementById("steamId");
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
     
     const steamId = steamIdInput.value.trim();
     
-    loading.classList.remove('hidden');
-    result.classList.add('hidden');
+    loading.classList.remove("hidden");
+    result.classList.add("hidden");
     submitBtn.disabled = true;
     
     try {
     const response = await fetch(`${API_URL}/recommend`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ steam_id: steamId }),
     });
 
 
-    const contentType = response.headers.get('content-type') || '';
-    const payload = contentType.includes('application/json')
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
         ? await response.json()
         : await response.text();
 
     if (response.ok) {
-        showResult('success', {
+        showResult("success", {
             steamId,
             game: payload.game,
             score: payload.score,
         });
 
     } else {
-        const detail = typeof payload === 'object' && payload !== null ? payload.detail : payload;
-        showResult('error', detail || `Erreur HTTP ${response.status}`);
+        const detail = typeof payload === "object" && payload !== null ? payload.detail : payload;
+        showResult("error", detail || `Erreur HTTP ${response.status}`);
     }
-    } catch (error) {
-    showResult('error', "Erreur de connexion à l'API");
+    } catch {
+    showResult("error", "Erreur de connexion à l'API");
     } finally {
-    loading.classList.add('hidden');
+    loading.classList.add("hidden");
     submitBtn.disabled = false;
     }
 
 });
 function escapeHtml(s) {
   return String(s)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function showResult(type, content) {
-  // si on appelle showResult('error', 'texte') on garde le comportement
-  if (type === 'error') {
-    result.className = `result error`;
+  // si on appelle showResult("error", "texte") on garde le comportement
+  if (type === "error") {
+    result.className = "result error";
     result.innerHTML = `
       <div class="alert">
         <div class="alertTitle">Erreur</div>
         <div class="alertText">${escapeHtml(content)}</div>
       </div>
     `;
-    result.classList.remove('hidden');
+    result.classList.remove("hidden");
     return;
   }
 
-  // type === 'success' : ici "content" est un objet attendu {steamId, game, score}
+  // type === "success" : ici "content" est un objet attendu {steamId, game, score}
   const steamId = escapeHtml(content.steamId);
   const game = escapeHtml(content.game);
   const scoreNum = Number(content.score);
@@ -96,11 +96,11 @@ function showResult(type, content) {
   const pct = Math.max(0, Math.min(100, Math.round(score * 100)));
 
   const badge =
-    pct >= 85 ? 'Excellent' :
-    pct >= 70 ? 'Solide' :
-    pct >= 50 ? 'Correct' : 'Faible';
+    pct >= 85 ? "Excellent" :
+    pct >= 70 ? "Solide" :
+    pct >= 50 ? "Correct" : "Faible";
 
-  result.className = `result success`;
+  result.className = "result success";
   result.innerHTML = `
     <div class="rec">
       <div class="recTop">
@@ -109,7 +109,7 @@ function showResult(type, content) {
         <div class="recTitle">
           <div class="kicker">Recommandation</div>
           <div class="headline">${game}</div>
-          <div class="subline">pour l’utilisateur <span class="mono">${steamId}</span></div>
+          <div class="subline">pour l'utilisateur <span class="mono">${steamId}</span></div>
         </div>
 
         <div class="pill">${badge}</div>
@@ -127,5 +127,5 @@ function showResult(type, content) {
       </div>
     </div>
   `;
-  result.classList.remove('hidden');
+  result.classList.remove("hidden");
 }
