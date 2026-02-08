@@ -38,7 +38,7 @@ class GamesService:
             print(f"⚠️ Erreur lors du chargement du modèle: {e}")
             self.model = None
 
-        csv_path = Path(__file__).resolve().parents[3] / "bdd" / "steamgames.csv"
+        csv_path = Path(__file__).resolve().parents[3] / "bdd" / "top100games.csv"
         try:
             self.games_db = pd.read_csv(csv_path, sep=",")
             print(f"✅ Base de données chargée: {len(self.games_db)} jeux")

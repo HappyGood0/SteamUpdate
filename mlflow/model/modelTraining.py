@@ -64,7 +64,7 @@ print("\n🚀 Entraînement du modèle avec MLflow...")
 
 with mlflow.start_run(run_name="random_forest_topGamesUser"):
     # 1. Logger les paramètres
-    params = {"n_estimators": 100, "max_depth": 10, "min_samples_split": 2, "random_state": 42}
+    params = {"n_estimators": 100, "max_depth": 50, "min_samples_split": 2, "random_state": 42}
     mlflow.log_params(params)
 
     # 2. Entraîner le modèle
