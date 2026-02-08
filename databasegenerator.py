@@ -1,10 +1,9 @@
 import json
-import time
-from steam_web_api import Steam
 import os
+import time
+
 from dotenv import load_dotenv
-import requests
-import numpy as np
+from steam_web_api import Steam
 
 # Charge les variables du fichier .env situé dans le même dossier
 load_dotenv()
@@ -12,11 +11,11 @@ load_dotenv()
 # Récupère la clé
 KEY = os.getenv("STEAM_API_KEY")
 
-    
-    # Utilisation de la variable KEY ici
+
+# Utilisation de la variable KEY ici
 steam = Steam(KEY)
 
-i=0
+i = 0
 testid = 76561198000047504
 with open("userid.json", "a", encoding="utf-8") as f:
     while i < 100:
@@ -25,9 +24,8 @@ with open("userid.json", "a", encoding="utf-8") as f:
 
         if owned_games is not None:
             games_list = owned_games.get("games", [])
-    
+
         if len(games_list) > 20:
-        
             json.dump(testid, f)
             f.write("\n")
             print("sucess")
