@@ -143,7 +143,7 @@ class GamesService:
 
                 # Ajouter à la liste des prédictions
                 predictions.append(
-                    {"game": game_structure, "similarity_score": float(similarity_score),"id": int(idx)}
+                    {"game": game_structure, "similarity_score": float(similarity_score),"nom": game_structure.nom}
                 )
 
             except Exception as e:
@@ -157,7 +157,7 @@ class GamesService:
 
         # Trier par score de similarité décroissant (meilleurs matchs en premier)
         predictions.sort(key=lambda x: x["similarity_score"], reverse=True)
-
+        
         # Retourner les top N meilleurs matchs
         return predictions[:top_n]
 
@@ -286,11 +286,12 @@ class GamesService:
         return profil
     
         
-    def get_game_data_by_id(self, id) -> GamesRecommendationResponse:
+    def get_game_data_by_id(self, id,score) -> GamesRecommendationResponse:
         result = GamesRecommendationResponse()
         game = self.steam.apps.search_games(id).get("apps")
-        result.img = str(game.get("img"))
-        result.prix = str(game.get("price"))
-        result.nom = str(game.get("name"))
-        result.lien = str(game.get("link"))
+        result.img = str(game[0].get("img"))
+        result.prix = str(game[0].get("price"))
+        result.nom = str(game[0].get("name"))
+        result.lien = str(game[0].get("link"))
+        result.score = str(score)
         return result
