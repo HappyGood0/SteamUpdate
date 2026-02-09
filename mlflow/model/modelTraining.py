@@ -146,10 +146,15 @@ with mlflow.start_run(run_name="random_forest_topGamesUser"):
 
     try:
         mlflow_client = MlflowClient()
-        mlflow_client.transition_model_version_stage(
-            name="topGamesUser_regressor", version=12, stage="Staging"
-        )
-        print("✅ Version 12 déplacée vers Staging")
+        versions = mlflow_client.search_model_versions("name='topGamesUser_regressor'")
+        if versions:
+            last_version = max(int(v.version) for v in versions)
+            mlflow_client.transition_model_version_stage(
+                name="topGamesUser_regressor", version=last_version, stage="Staging"
+            )
+            print(f"✅ Version {last_version} déplacée vers Staging")
+        else:
+            print("⚠️  Aucun modèle trouvé à promouvoir.")
     except Exception as e:
         print(f"⚠️  Impossible de changer le stage: {e}")
 

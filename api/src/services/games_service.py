@@ -1,9 +1,9 @@
 import os
+import re
 import time
 from pathlib import Path
-import re
-import mlflow.sklearn
 
+import mlflow.sklearn
 import numpy as np
 import pandas as pd
 import requests
@@ -26,15 +26,14 @@ import mlflow
 
 class GamesService:
     """Service pour récupérer les recommandations de jeux depuis une API fictive"""
-    
+
     def __init__(self, id_steam: int):
         # Configuration de l'API de jeux (exemple fictif)
         self.id_steam = id_steam
         load_dotenv()
         key = os.getenv("STEAM_API_KEY")
         self.steam = Steam(key)
-        try:     
-            
+        try:
             mlflow.set_tracking_uri("http://mlflow:5000")
             self.model = mlflow.sklearn.load_model("models:/topGamesUser_regressor/Staging")
             print("✅ Modèle MLflow chargé avec succès")
@@ -49,20 +48,20 @@ class GamesService:
         except Exception as e:
             print(f"⚠️ Erreur lors du chargement de la BDD: {e}")
             self.games_db = None
-    
-    def formater_nom(self, chaine): # Ajoute 'self' ici
+
+    def formater_nom(self, chaine):  # Ajoute 'self' ici
         # On s'assure que l'entrée est bien une chaîne de caractères
         chaine_str = str(chaine)
-        
+
         # 1. Remplace les espaces et les tirets par des underscores
-        resultat = re.sub(r'[ \-]', '_', chaine_str)
-        
+        resultat = re.sub(r"[ \-]", "_", chaine_str)
+
         # 2. Si le premier caractère est un chiffre, on ajoute un "_" devant
         if resultat and resultat[0].isdigit():
             resultat = "_" + resultat
-            
+
         return resultat
-    
+
     def get_best_games_with_scores(self, game: GamesStructure, top_n: int = 3) -> list[dict]:
         """
         Compare un jeu avec tous les jeux de la base de données et retourne les meilleurs matchs
@@ -118,10 +117,10 @@ class GamesService:
 
                 # Créer un DataFrame UNIQUEMENT avec les colonnes de tags (pas de 'id' ni 'nom')
                 df_features = pd.DataFrame([features], columns=VALIDTAGBDD)
-                print ("df_features:", df_features)
+                print("df_features:", df_features)
                 # Prédire le score de similarité avec le modèle MLflow
                 similarity_score = self.model.predict(df_features)[0]
-                print ("similarity_score:", similarity_score)
+                print("similarity_score:", similarity_score)
                 # Construire le dictionnaire de données pour GamesStructure
                 game_data = {
                     "id": int(idx),  # Utiliser l'index comme ID
@@ -143,7 +142,11 @@ class GamesService:
 
                 # Ajouter à la liste des prédictions
                 predictions.append(
-                    {"game": game_structure, "similarity_score": float(similarity_score),"nom": game_structure.nom}
+                    {
+                        "game": game_structure,
+                        "similarity_score": float(similarity_score),
+                        "nom": game_structure.nom,
+                    }
                 )
 
             except Exception as e:
@@ -157,7 +160,7 @@ class GamesService:
 
         # Trier par score de similarité décroissant (meilleurs matchs en premier)
         predictions.sort(key=lambda x: x["similarity_score"], reverse=True)
-        
+
         # Retourner les top N meilleurs matchs
         return predictions[:top_n]
 
@@ -284,9 +287,8 @@ class GamesService:
                 if field_name in userprofil[2]:
                     setattr(profil, field_name, userprofil[2][field_name])
         return profil
-    
-        
-    def get_game_data_by_id(self, id,score) -> GamesRecommendationResponse:
+
+    def get_game_data_by_id(self, id, score) -> GamesRecommendationResponse:
         result = GamesRecommendationResponse()
         game = self.steam.apps.search_games(id).get("apps")
         result.img = str(game[0].get("img"))

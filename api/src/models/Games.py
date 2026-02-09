@@ -169,15 +169,17 @@ VALIDTAGBDD = [
     "Local_Co_op",
 ]
 
+
 class GamesRecommendationResponse(BaseModel):
     """DTO pour la requête de recommandations de jeux"""
 
-    img: str = Field( description="URL de l'image du jeu", min_length=1,default="")
-    prix: str = Field( description="Prix du jeu en dollar", default="")
-    tags: list[str] = Field( description="Liste des tags associés au jeu",default=[])
-    nom: str = Field( description="Nom du jeu", min_length=1,default="")
-    lien: str = Field( description="URL du jeu", min_length=1,default="")
-    score : float = Field( description="Score de similarité du jeu recommandé", ge=0.0, default=0.0)
+    img: str = Field(description="URL de l'image du jeu", min_length=1, default="")
+    prix: str = Field(description="Prix du jeu en dollar", default="")
+    tags: list[str] = Field(description="Liste des tags associés au jeu", default=[])
+    nom: str = Field(description="Nom du jeu", min_length=1, default="")
+    lien: str = Field(description="URL du jeu", min_length=1, default="")
+    score: float = Field(description="Score de similarité du jeu recommandé", ge=0.0, default=0.0)
+
 
 class GamesRecommendationRequest(BaseModel):
     """DTO pour la réponse de recommandations de jeux"""
@@ -202,7 +204,9 @@ class GamesStructure(BaseModel):
     Dark: float = Field(default=0.0, description="Score du tag Dark", ge=0)
     Mystery: float = Field(default=0.0, description="Score du tag Mystery", ge=0)
     Survival: float = Field(default=0.0, description="Score du tag Survival", ge=0)
-    Psychological_Horror: float = Field(default=0.0, description="Score du tag Psychological Horror", ge=0)
+    Psychological_Horror: float = Field(
+        default=0.0, description="Score du tag Psychological Horror", ge=0
+    )
     Medieval: float = Field(default=0.0, description="Score du tag Medieval", ge=0)
     Management: float = Field(default=0.0, description="Score du tag Management", ge=0)
     Sports: float = Field(default=0.0, description="Score du tag Sports", ge=0)
@@ -250,8 +254,12 @@ class GamesStructure(BaseModel):
     Open_World: float = Field(default=0.0, description="Score du tag Open World", ge=0)
     Story_Rich: float = Field(default=0.0, description="Score du tag Story Rich", ge=0)
     Combat: float = Field(default=0.0, description="Score du tag Combat", ge=0)
-    Turn_Based_Combat: float = Field(default=0.0, description="Score du tag Turn-Based Combat", ge=0)
-    Turn_Based_Tactics: float = Field(default=0.0, description="Score du tag Turn-Based Tactics", ge=0)
+    Turn_Based_Combat: float = Field(
+        default=0.0, description="Score du tag Turn-Based Combat", ge=0
+    )
+    Turn_Based_Tactics: float = Field(
+        default=0.0, description="Score du tag Turn-Based Tactics", ge=0
+    )
     Hack_and_Slash: float = Field(default=0.0, description="Score du tag Hack and Slash", ge=0)
     Deckbuilding: float = Field(default=0.0, description="Score du tag Deckbuilding", ge=0)
     Team_Based: float = Field(default=0.0, description="Score du tag Team-Based", ge=0)
