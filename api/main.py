@@ -45,9 +45,12 @@ async def recommend(request: SteamRequest):
     try:
         service = GamesService(id_steam=int(request.steam_id))
         profil = service.get_game_structure()
-        recommended = service.get_best_games_with_scores(profil, top_n=3)
+        top3game = service.get_best_games_with_scores(profil, top_n=3)
+        recommended = []
+        for game in top3game:
+            recommended.append(service.get_game_data_by_id(game("id")))
+
         result = {
-            "steam_id": request.steam_id,
             "recommendations": recommended,
         }
         result["build"] = "46799e6"

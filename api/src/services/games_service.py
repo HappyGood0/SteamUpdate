@@ -284,3 +284,13 @@ class GamesService:
                 if field_name in userprofil[2]:
                     setattr(profil, field_name, userprofil[2][field_name])
         return profil
+    
+        
+    def get_game_data_by_id(self, id) -> GamesRecommendationResponse:
+        result = GamesRecommendationResponse()
+        game = self.steam.apps.search_games(id).get("apps")
+        result.img = str(game.get("img"))
+        result.prix = str(game.get("price"))
+        result.nom = str(game.get("name"))
+        result.lien = str(game.get("link"))
+        return result

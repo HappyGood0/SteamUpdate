@@ -173,7 +173,7 @@ class GamesRecommendationResponse(BaseModel):
     """DTO pour la requête de recommandations de jeux"""
 
     img: str = Field(..., description="URL de l'image du jeu", min_length=1)
-    prix: int = Field(..., description="Prix du jeu en centimes", ge=0)
+    prix: str = Field(..., description="Prix du jeu en dollar", ge=0)
     tags: list[str] = Field(..., description="Liste des tags associés au jeu")
     nom: str = Field(..., description="Nom du jeu", min_length=1)
     lien: str = Field(..., description="URL du jeu", min_length=1)
