@@ -7,3 +7,4 @@ pytest-asyncio==0.23.0
 httpx==0.26.0
 mlflow
 python-steam-api
+scikit-learn ==1.6.1
