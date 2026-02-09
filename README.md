@@ -10,7 +10,10 @@ SteamUpdate (nom provisioire) présente une interface Web permettant de recomman
 ## Utilisation
 
 ### Génération de la clé API Steam
-[...]
+
+1. Générer une flé API Steam sur https://steamcommunity.com/dev/apikey
+
+2. Ajouter un fichier .env à la racine et ajouter STEAM_API_KEY="VOTRE CLE"
 
 
 ## Mise en place de Garage
@@ -64,3 +67,7 @@ Pour utiliser MLFlow avec Python, installer la bibliothèque :
 ```shell
 pip install mlflow
 ```
+
+## Créer le model : 
+
+python3 ./mlflow/model/modelTraining.py

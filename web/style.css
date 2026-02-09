@@ -390,3 +390,9 @@ input[type="text"]:focus{
 .headline:hover {
   text-decoration: underline;
 }
+
+.result.success {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

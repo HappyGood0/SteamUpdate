@@ -51,15 +51,20 @@ form.addEventListener('submit', async (e) => {
     if (response.ok) {
         // Nouveau format: { steam_id, recommendations: [...] }
         if (payload && Array.isArray(payload.recommendations) && payload.recommendations.length > 0) {
-            const top = payload.recommendations[0];
+            // reset le container pour empiler les résultats
+        result.innerHTML = '';
+        result.classList.add('hidden');
 
-            showResult('success', {
-                steamId,
-                game: top.nom ?? top.name ?? top.game ?? 'N/A',
-                image: top.img,
-                link: top.lien,
-                score: top.score ?? 0.95,
-            });
+        payload.recommendations.forEach((rec) => {
+          showResult('success', {
+            steamId,
+            game: rec.nom ?? rec.name ?? rec.game ?? 'N/A',
+            image: rec.img,
+            link: rec.lien,
+            score: rec.score ?? 0.95,
+          });
+        });
+
         } else {
             // Ancien format: { steam_id, game, score }
             showResult('success', {
@@ -118,7 +123,7 @@ function showResult(type, content) {
     pct >= 50 ? 'Correct' : 'Faible';
 
   result.className = `result success`;
-  result.innerHTML = `
+  result.insertAdjacentHTML('beforeend', `
   <div class="rec">
     <div class="recTop recTopWithImage">
 
@@ -158,7 +163,7 @@ function showResult(type, content) {
       </div>
     </div>
   </div>
-`;
+`);
 
 
   result.classList.remove('hidden');
