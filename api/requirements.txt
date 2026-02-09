@@ -1,5 +1,5 @@
 fastapi==0.115.0
-uvicorn[standard]==0.32.0
+uvicorn[standard]==0.40.0
 pydantic==2.12.5
 prometheus-fastapi-instrumentator==7.0.0
 pytest==8.0.0
