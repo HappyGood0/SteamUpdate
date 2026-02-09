@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 import re
 import mlflow.sklearn
+
 import numpy as np
 import pandas as pd
 import requests
@@ -142,7 +143,7 @@ class GamesService:
 
                 # Ajouter à la liste des prédictions
                 predictions.append(
-                    {"game": game_structure, "similarity_score": float(similarity_score)}
+                    {"game": game_structure, "similarity_score": float(similarity_score),"id": int(idx)}
                 )
 
             except Exception as e:
