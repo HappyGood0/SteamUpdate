@@ -48,7 +48,7 @@ async def recommend(request: SteamRequest):
         top3game = service.get_best_games_with_scores(profil, top_n=3)
         recommended = []
         for game in top3game:
-            recommended.append(service.get_game_data_by_id(game("id")))
+            recommended.append(service.get_game_data_by_id(game.get("id")))
 
         result = {
             "recommendations": recommended,
