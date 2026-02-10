@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 from fastapi.testclient import TestClient
 from main import app
 
@@ -135,8 +134,7 @@ def test_recommend_endpoint_invalid_payload():
         assert "steam_id ou pseudo requis" in str(e)
 
 
-@pytest.mark.asyncio
-async def test_metrics_exposed():
+def test_metrics_exposed():
     """Test que les métriques Prometheus sont exposées"""
     response = client.get("/metrics")
     assert response.status_code == 200
