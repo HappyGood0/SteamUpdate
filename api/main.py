@@ -29,7 +29,8 @@ health_counter = Counter("Health_check_requests_total", "Number of health check 
 
 
 class SteamRequest(BaseModel):
-    steam_id: str
+    steam_id: str | None = None
+    pseudo: str | None = None
 
 
 @app.get("/api/health")
@@ -43,7 +44,10 @@ async def recommend(request: SteamRequest):
     start_time = time.time()
 
     try:
-        service = GamesService(id_steam=int(request.steam_id))
+        steam_identifier = request.steam_id or getattr(request, "pseudo", None)
+        if not steam_identifier:
+            raise ValueError("steam_id ou pseudo requis")
+        service = GamesService(steam_identifier)
         profil = service.get_game_structure()
         top3game = service.get_best_games_with_scores(profil, top_n=3)
         recommended = []
@@ -52,6 +56,7 @@ async def recommend(request: SteamRequest):
             recommended.append(service.get_game_data_by_id(str(game["nom"]), score))
 
         result = {
+            "steam_id": str(service.id_steam),
             "recommendations": recommended,
         }
         result["build"] = "46799e6"

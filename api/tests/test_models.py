@@ -23,12 +23,12 @@ def test_games_recommendation_response_valid():
     """Test de création valide d'une réponse de recommandation"""
     response = GamesRecommendationResponse(
         img="https://example.com/game.jpg",
-        prix=1999,
+        prix="1999",  # Correction: string
         tags=["Action", "RPG"],
         nom="Test Game",
         lien="https://store.steampowered.com/app/123",
     )
-    assert response.prix == 1999
+    assert response.prix == "1999"
     assert "Action" in response.tags
 
 

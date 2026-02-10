@@ -84,8 +84,8 @@ services:
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - MLFLOW_S3_ENDPOINT_URL=http://garage:3900
-      - AWS_ACCESS_KEY_ID=GKcf30fc448c30038ac06884a2
-      - AWS_SECRET_ACCESS_KEY=b41825c9abeeecd31a26e7bb571881b4f55246b8bc11d7f653debdcdca1fd82b
+      - AWS_ACCESS_KEY_ID=GK0f43c053741b3dd4f7b62942
+      - AWS_SECRET_ACCESS_KEY=fb9df1be0caf2a315c4cef08768db075de378ed7a2736fd30d0ac9807498c174
       - MLFLOW_GUNICORN_OPTS=--timeout 600 --workers 4 --log-level=debug
     command: >
       mlflow server

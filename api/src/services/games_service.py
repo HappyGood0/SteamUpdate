@@ -27,12 +27,19 @@ import mlflow
 class GamesService:
     """Service pour récupérer les recommandations de jeux depuis une API fictive"""
 
-    def __init__(self, id_steam: int):
+    def __init__(self, steam_identifier: str):
         # Configuration de l'API de jeux (exemple fictif)
-        self.id_steam = id_steam
+        self.id_steam = steam_identifier
         load_dotenv()
         key = os.getenv("STEAM_API_KEY")
         self.steam = Steam(key)
+
+        # Accepte soit un SteamID, soit un pseudo
+        if str(steam_identifier).isdigit():
+            self.id_steam = int(steam_identifier)
+        else:
+            self.id_steam = self.resolve_vanity_url(steam_identifier)
+
         try:
             mlflow.set_tracking_uri("http://mlflow:5000")
             self.model = mlflow.sklearn.load_model("models:/topGamesUser_regressor/Staging")
@@ -175,7 +182,8 @@ class GamesService:
 
         usergamelist = usergame.get("games")
         gamedata = []
-
+        if usergamelist is None:
+            return []
         for game in usergamelist:
             gameid = game.get("appid")
             gamename = game.get("name")
@@ -238,11 +246,10 @@ class GamesService:
         return useravgprice / nbpaidgame
 
     def get_favorite_game_tags(self, gamedata) -> list:
-
         usergametags = []
         i = 0
         j = 0
-        while i < 5:
+        while i < 5 and j < len(gamedata):
             gameid = gamedata[j][0]
             url = f"https://steamspy.com/api.php?request=appdetails&appid={gameid}"
             response = requests.get(url).json()
@@ -251,7 +258,7 @@ class GamesService:
                 filtered_tags = {key: value for key, value in tags.items() if key in VALIDTAG}
 
                 i += 1
-                usergametags.append([gamedata[i], filtered_tags])
+                usergametags.append([gamedata[j], filtered_tags])
 
             j += 1
 
@@ -295,5 +302,13 @@ class GamesService:
         result.prix = str(game[0].get("price"))
         result.nom = str(game[0].get("name"))
         result.lien = str(game[0].get("link"))
-        result.score = str(score)
+        result.score = float(score)
         return result
+
+    def resolve_vanity_url(self, vanity_url: str) -> int:
+        url = f"https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key={os.getenv('STEAM_API_KEY')}&vanityurl={vanity_url}"
+        response = requests.get(url).json()
+        if response["response"]["success"] == 1:
+            return int(response["response"]["steamid"])
+        else:
+            raise ValueError("Pseudo Steam inconnu ou non valide")
