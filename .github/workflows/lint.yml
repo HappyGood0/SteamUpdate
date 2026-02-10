@@ -13,23 +13,17 @@ jobs:
   ruff-backend:
     name: Ruff (Python Backend)
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-
-      - name: Install Ruff
-        run: pip install ruff
-
-      - name: Run Ruff linter
+          python-version: "3.11"
+      - name: Install Ruff (version 0.14.11)
+        run: pip install ruff==0.14.11
+      - name: Run Ruff check
         run: ruff check .
-
-      - name: Run Ruff formatter check
+      - name: Run Ruff format check
         run: ruff format --check .
 
   eslint-frontend:
