@@ -2,11 +2,51 @@
 
 SteamUpdate (nom provisoire) présente une interface Web permettant de recommander un ou plusieurs jeux provenant du store Steam à un utilisateur, en fonction des jeux qu'il possède et auxquels il a joué.
 
+## Version
+1.0.0
+
+## Déploiements
+- **Backend Render** : [https://steamupdate.onrender.com/docs](https://steamupdate.onrender.com/docs)
+- **Frontend GitHub Pages** : [https://happygood0.github.io/SteamUpdate/](https://happygood0.github.io/SteamUpdate/)
+
+
+
 ## Graphes des services
 
 ![UML](UML.png)
 
-## Utilisation
+## Technologies utilisées
+- Python 3.10/3.11
+- FastAPI
+- MLflow
+- Docker
+- Prometheus
+- Grafana
+- GitHub Actions
+- Render
+- GitHub Pages
+
+## Installation rapide
+```bash
+git clone https://github.com/HappyGood0/SteamUpdate.git
+cd SteamUpdate
+docker compose up -d
+```
+
+## Structure du projet
+- `api/` : Backend FastAPI, tests, modèles
+- `web/` : Frontend (HTML/CSS/JS)
+- `mlflow/` : Modèles ML et scripts d'entraînement
+- `grafana/`, `prometheus/` : Monitoring
+- `bdd/` : Données CSV
+- `.github/workflows/` : Pipelines CI/CD
+
+## Tests
+Pour lancer les tests backend :
+```bash
+pytest api/tests/ -v
+```
+
 
 ### Génération de la clé API Steam
 
@@ -68,8 +108,6 @@ eslint web/ --ext .js
 
 ---
 
-## Mise en place de Garage
-
 1. Démarrer le service Garage avec Docker Compose :
 ```shell
 docker compose up  -d
@@ -123,3 +161,9 @@ pip install mlflow
 ```shell
 python3 ./mlflow/model/modelTraining.py
 ```
+
+## Contributeurs / Contact
+- [HappyGood0](https://github.com/HappyGood0)
+- [Pierre-Antoine](https://github.com/Sou-race)
+- [ese-SD](https://github.com/ese-SD)
+- [Rubenso](https://github.com/RubensGHub)
